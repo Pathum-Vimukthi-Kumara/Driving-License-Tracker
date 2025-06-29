@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Driving License Tracking System - Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .success { background: rgba(40, 167, 69, 0.3); }
+        .error { background: rgba(220, 53, 69, 0.3); }
+        .info { background: rgba(23, 162, 184, 0.3); }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚗 Driving License Tracking System</h1>
+        <p>Test connectivity and basic functionality</p>
+        
+        <div id="status" class="status info">
+            Status: Initializing...
+        </div>
+        
+        <h3>Backend Connection Test</h3>
+        <button onclick="testBackend()">Test Backend Connection</button>
+        <div id="backend-result"></div>
+        
+        <h3>Quick Login Test</h3>
+        <div>
+            <select id="userType">
+                <option value="user">Citizen</option>
+                <option value="officer">Police Officer</option>
+                <option value="admin">Admin</option>
+            </select>
+            <input type="email" id="email" placeholder="Email">
+            <input type="password" id="password" placeholder="Password">
+            <button onclick="testLogin()">Test Login</button>
+        </div>
+        <div id="login-result"></div>
+        
+        <h3>Application URLs</h3>
+        <ul>
+            <li><a href="http://localhost:3001" target="_blank" style="color: #ffeb3b;">React Frontend (Port 3001)</a></li>
+            <li><a href="http://localhost:3000" target="_blank" style="color: #ffeb3b;">Alternative Frontend (Port 3000)</a></li>
+            <li><a href="http://localhost:5000" target="_blank" style="color: #ffeb3b;">Backend API (Port 5000)</a></li>
+        </ul>
+        
+        <h3>Troubleshooting Firefox Extension Error</h3>
+        <ol>
+            <li>Clear browser cache and cookies</li>
+            <li>Disable all Firefox extensions temporarily</li>
+            <li>Try Firefox Safe Mode (Hold Shift while opening)</li>
+            <li>Use Chrome or Edge as alternative</li>
+            <li>Update Firefox to latest version</li>
+        </ol>
+    </div>
+
+    <script>
+        async function testBackend() {
+            const result = document.getElementById('backend-result');
+            const status = document.getElementById('status');
+            
+            try {
+                const response = await fetch('http://localhost:5000/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: 'test@test.com',
+                        password: 'test',
+                        userType: 'user'
+                    })
+                });
+                
+                if (response.status === 401 || response.status === 400) {
+                    result.innerHTML = '<div class="status info">✅ Backend is running! (Login failed as expected with test credentials)</div>';
+                    status.innerHTML = 'Status: Backend Connected';
+                    status.className = 'status success';
+                } else {
+                    result.innerHTML = '<div class="status success">✅ Backend is running and responding!</div>';
+                    status.innerHTML = 'Status: All Systems Operational';
+                    status.className = 'status success';
+                }
+            } catch (error) {
+                result.innerHTML = '<div class="status error">❌ Backend connection failed: ' + error.message + '</div>';
+                status.innerHTML = 'Status: Backend Connection Failed';
+                status.className = 'status error';
+            }
+        }
+        
+        async function testLogin() {
+            const result = document.getElementById('login-result');
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const userType = document.getElementById('userType').value;
+            
+            if (!email || !password) {
+                result.innerHTML = '<div class="status error">Please enter email and password</div>';
+                return;
+            }
+            
+            try {
+                const response = await fetch('http://localhost:5000/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        password: password,
+                        userType: userType
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    result.innerHTML = '<div class="status success">✅ Login successful! Token: ' + data.token.substring(0, 20) + '...</div>';
+                } else {
+                    result.innerHTML = '<div class="status error">❌ Login failed: ' + data.message + '</div>';
+                }
+            } catch (error) {
+                result.innerHTML = '<div class="status error">❌ Login error: ' + error.message + '</div>';
+            }
+        }
+        
+        // Auto-test backend on page load
+        window.onload = function() {
+            setTimeout(testBackend, 1000);
+        };
+    </script>
+</body>
+</html>
