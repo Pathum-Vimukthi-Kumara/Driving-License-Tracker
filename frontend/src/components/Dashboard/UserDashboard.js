@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Navbar, Nav, Container, Card, Table, Badge, Button, Modal } from 'react-bootstrap';
+import { Navbar, Nav, Container, Table, Badge, Button, Modal } from 'react-bootstrap';
 import { userAPI } from '../../utils/api';
 import '../../styles/user-dashboard.css';
 
@@ -120,7 +120,9 @@ const UserDashboard = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         navigate('/login');
-    };    const handlePayViolation = (violationId) => {
+    };
+
+    const handlePayViolation = (violationId) => {
         navigate(`/payment/${violationId}`);
     };
 
@@ -142,7 +144,9 @@ const UserDashboard = () => {
             hour: '2-digit',
             minute: '2-digit'
         });
-    };    const formatCurrency = (amount) => {
+    };
+
+    const formatCurrency = (amount) => {
         return new Intl.NumberFormat('en-LK', {
             style: 'currency',
             currency: 'LKR'
@@ -188,15 +192,15 @@ const UserDashboard = () => {
                     <div className="stats-cards">
                         <div className="stat-card total">
                             <h3>{stats.total}</h3>
-                            <p>Total\nViolations</p>
+                            <p>Total Violations</p>
                         </div>
                         <div className="stat-card pending">
                             <h3>{stats.pending}</h3>
-                            <p>Pending\nPayments</p>
+                            <p>Pending Payments</p>
                         </div>
                         <div className="stat-card paid">
                             <h3>{stats.paid}</h3>
-                            <p>Paid\nViolations</p>
+                            <p>Paid Violations</p>
                         </div>
                     </div>
 
@@ -314,7 +318,8 @@ const UserDashboard = () => {
                                     </tbody>
                                 </Table>
                             </div>
-                        )}                    </div>
+                        )}
+                    </div>
                 </Container>
             </div>
 
@@ -323,7 +328,8 @@ const UserDashboard = () => {
                 <Modal.Header closeButton>
                     <Modal.Title>Violation Details</Modal.Title>
                 </Modal.Header>
-                <Modal.Body>                    {selectedViolation && (
+                <Modal.Body>
+                    {selectedViolation && (
                         <div className="violation-details">
                             {/* Header Section - Violation ID and Status */}
                             <div className="violation-header mb-4">

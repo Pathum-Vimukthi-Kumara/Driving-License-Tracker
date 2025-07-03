@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Card, Form, Button, Alert, Navbar, Nav } from 'react-bootstrap';
 import { violationAPI, paymentAPI } from '../../utils/api';
@@ -19,9 +19,9 @@ const PaymentSubmission = () => {
 
     useEffect(() => {
         fetchViolation();
-    }, [violationId]);
+    }, [violationId, fetchViolation]);
 
-    const fetchViolation = async () => {
+    const fetchViolation = useCallback(async () => {
         try {
             const response = await violationAPI.getById(violationId);
             setViolation(response.data);
@@ -34,7 +34,7 @@ const PaymentSubmission = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [violationId]);
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];

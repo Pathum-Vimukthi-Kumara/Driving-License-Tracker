@@ -93,59 +93,83 @@
 }
 
 /* Stats Row */
-.officer-stats-row {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1.5rem;
-    margin-bottom: 2rem;
+.officer-dashboard .officer-stats-row {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 1.5rem !important;
+    margin-bottom: 2rem !important;
+    width: 100%;
 }
 
-.officer-stat-card {
-    background: white;
-    border-radius: 10px;
-    padding: 1.5rem;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    border: none;
+@media (max-width: 768px) {
+    .officer-dashboard .officer-stats-row {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 1rem !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .officer-dashboard .officer-stats-row {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+.officer-dashboard .officer-stat-card {
+    background: white !important;
+    border-radius: 10px !important;
+    padding: 0 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+    border: none !important;
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
+    height: auto;
+    margin-bottom: 1rem;
 }
 
-.officer-stat-card:hover {
+.officer-dashboard .officer-stat-card:hover {
     transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15) !important;
 }
 
-.officer-stat-icon {
+.officer-dashboard .officer-stat-card .card-body {
+    padding: 1.5rem !important;
+    text-align: center;
+    background: white !important;
+}
+
+.officer-dashboard .officer-stat-icon {
     width: 50px;
     height: 50px;
-    background: linear-gradient(135deg, #FE6F33, #FF8A65);
+    background: linear-gradient(135deg, #FE6F33, #FF8A65) !important;
     border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 1rem;
+    margin: 0 auto 1rem auto;
 }
 
-.officer-stat-icon i {
-    color: white;
+.officer-dashboard .officer-stat-icon i {
+    color: white !important;
     font-size: 1.2rem;
 }
 
-.officer-stat-number {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #2E3F50;
-    margin-bottom: 0.25rem;
-}
+.officer-dashboard .officer-stat-number {
+    font-size: 2rem !important;
+    font-weight: 700 !important;
+    color: #2E3F50 !important;
+    margin-bottom: 0.25rem !important;
+    text-align: center;
     line-height: 1;
 }
 
-.officer-stat-label {
-    font-size: 0.85rem;
-    color: #666;
-    font-weight: 500;
-    margin: 0;
+.officer-dashboard .officer-stat-label {
+    font-size: 0.85rem !important;
+    color: #666 !important;
+    font-weight: 500 !important;
+    margin: 0 !important;
+    text-align: center;
+    white-space: pre-line;
 }
 
 /* Profile Card */
@@ -482,6 +506,210 @@
     font-size: 0.9rem;
 }
 
+/* Dashboard Grid Layout */
+.officer-dashboard .dashboard-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 2rem !important;
+    margin-bottom: 2rem !important;
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    .officer-dashboard .dashboard-grid {
+        grid-template-columns: 1fr !important;
+        gap: 1rem !important;
+    }
+}
+
+/* License Search Section */
+.license-search-section {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-left: 4px solid #FE6F33;
+}
+
+.license-search-section h3 {
+    color: #2E3F50;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+}
+
+.license-search-section h3 i {
+    margin-right: 0.75rem;
+    color: #FE6F33;
+}
+
+.search-form {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    align-items: center;
+}
+
+.search-form .form-control {
+    flex: 5;
+    padding: 0.875rem 1rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    min-width: 500px;
+    height: 48px;
+}
+
+.search-form .form-control:focus {
+    border-color: #FE6F33;
+    box-shadow: 0 0 0 0.2rem rgba(254, 111, 51, 0.25);
+    outline: none;
+}
+
+.search-form .btn:hover {
+    background: #e55a2b;
+    transform: translateY(-1px);
+}
+
+.search-form .btn:disabled {
+    background: #ccc;
+    transform: none;
+    cursor: not-allowed;
+}
+
+.search-form .btn i {
+    font-size: 0.8rem;
+    margin-right: 0.25rem;
+}
+
+/* Responsive adjustments for search form */
+@media (max-width: 768px) {
+    .search-form {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .search-form .form-control {
+        flex: 1;
+        width: 100%;
+    }
+    
+    .search-form .btn {
+        flex: 1;
+        width: 100%;
+        min-width: auto;
+    }
+}
+
+/* Quick Actions Section */
+.quick-actions-section {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-left: 4px solid #FE6F33;
+}
+
+.quick-actions-section h3 {
+    color: #2E3F50;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+}
+
+.quick-actions-section h3 i {
+    margin-right: 0.75rem;
+    color: #FE6F33;
+}
+
+.quick-actions {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.quick-action-btn {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    background: #f8f9fa;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    text-decoration: none;
+    color: #2E3F50;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.quick-action-btn:hover {
+    background: #FE6F33;
+    border-color: #FE6F33;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(254, 111, 51, 0.3);
+    text-decoration: none;
+}
+
+.quick-action-btn i {
+    margin-right: 0.75rem;
+    font-size: 1.1rem;
+    width: 20px;
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .quick-actions {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Search Results */
+.search-results {
+    margin-top: 1.5rem;
+}
+
+.user-info-card {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 1.5rem;
+    border-left: 4px solid #28a745;
+}
+
+.user-info-card h5 {
+    color: #2E3F50;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.user-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.user-info-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-info-item label {
+    font-size: 0.8rem;
+    color: #666;
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+}
+
+.user-info-item span {
+    font-size: 0.9rem;
+    color: #333;
+    font-weight: 600;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .officer-stats {
@@ -545,6 +773,65 @@
         font-size: 0.8rem;
         padding: 0.4rem 0.8rem !important;
     }
+}
+
+/* Table Styling */
+.officer-dashboard .table {
+    margin: 0 !important;
+    font-size: 0.85rem;
+    background: white;
+}
+
+
+
+
+
+.officer-dashboard .table-responsive {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Badge Styling */
+.officer-dashboard .badge {
+    font-size: 0.75rem !important;
+    padding: 0.5rem 0.75rem !important;
+    font-weight: 500 !important;
+}
+
+/* Button Styling */
+.officer-dashboard .btn {
+    font-size: 0.8rem;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+.officer-dashboard .search-btn {
+    background: #FE6F33 !important;
+    border: none !important;
+    color: white !important;
+    padding: 0.5rem 0.75rem !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    font-size: 0.8rem !important;
+    transition: all 0.2s ease;
+    height: 48px !important;
+    min-width: 0px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.officer-dashboard .search-btn:hover {
+    background: #e55a2b !important;
+    transform: translateY(-1px);
+}
+
+.officer-dashboard .search-btn:disabled {
+    background: #ccc !important;
+    transform: none;
+    cursor: not-allowed !important;
 }
 
 /* Utility Classes */
