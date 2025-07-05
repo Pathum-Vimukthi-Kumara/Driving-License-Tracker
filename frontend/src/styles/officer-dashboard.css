@@ -304,14 +304,7 @@
     background: #E55A28;
 }
 
-/* Violations Table */
-.violations-section {
-    background: white;
-    border-radius: 8px;
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
+
 
 .violations-header {
     display: flex;
@@ -343,37 +336,8 @@
 }
 
 /* Violations Table */
-.violations-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.85rem;
-}
 
-.violations-table th {
-    background: #FE6F33;
-    color: white;
-    padding: 0.75rem 0.5rem;
-    text-align: left;
-    font-weight: 600;
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    border: none;
-}
 
-.violations-table td {
-    padding: 0.75rem 0.5rem;
-    border-bottom: 1px solid #f0f0f0;
-    vertical-align: middle;
-}
-
-.violations-table tbody tr:hover {
-    background: #f8f9fa;
-}
-
-.violations-table tbody tr:last-child td {
-    border-bottom: none;
-}
 
 /* Status Badges */
 .status-badge {
@@ -559,7 +523,7 @@
     border-radius: 8px;
     font-size: 1rem;
     transition: all 0.2s ease;
-    min-width: 500px;
+    min-width: 0;
     height: 48px;
 }
 
@@ -567,6 +531,23 @@
     border-color: #FE6F33;
     box-shadow: 0 0 0 0.2rem rgba(254, 111, 51, 0.25);
     outline: none;
+}
+
+.search-form .btn {
+    flex: 0 0 auto;
+    padding: 0.5rem 0.75rem;
+    background: #FE6F33;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-weight: 600;
+    font-size: 0.8rem;
+    transition: all 0.2s ease;
+    height: 48px;
+    min-width: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .search-form .btn:hover {
@@ -649,7 +630,7 @@
 .quick-action-btn:hover {
     background: #FE6F33;
     border-color: #FE6F33;
-    color: white;
+    color: white; 
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(254, 111, 51, 0.3);
     text-decoration: none;
@@ -784,7 +765,16 @@
 
 
 
+.officer-dashboard .table tbody td {
+    padding: 1rem 0.75rem !important;
+    border-top: 1px solid #e9ecef !important;
+    vertical-align: middle;
+    color: #333;
+}
 
+.officer-dashboard .table tbody tr:hover {
+    background: #f8f9fa !important;
+}
 
 .officer-dashboard .table-responsive {
     border-radius: 8px;
@@ -817,7 +807,7 @@
     font-size: 0.8rem !important;
     transition: all 0.2s ease;
     height: 48px !important;
-    min-width: 0px !important;
+    max-width: 200px !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;

@@ -48,13 +48,10 @@ const OfficerDashboard = () => {
 
     const fetchOfficerData = async () => {
         try {
-            console.log('Fetching officer data...');
             const response = await officerAPI.getProfile();
-            console.log('Officer data received:', response.data);
             setOfficer(response.data);
         } catch (error) {
             console.error('Error fetching officer data:', error);
-            console.error('Error response:', error.response?.data);
             setError('Failed to load officer profile. Please try refreshing the page.');
         }
     };

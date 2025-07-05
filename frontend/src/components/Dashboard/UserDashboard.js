@@ -30,91 +30,32 @@ const UserDashboard = () => {
             console.error('Error fetching user data:', error);
         }
     };
-
     const fetchViolations = async () => {
-        try {
+        try {                                                   
             const response = await userAPI.getViolations();
-            let violationsData = response.data;
-            
-            // If no violations from API, show sample data to match screenshot
-            if (!violationsData || violationsData.length === 0) {
-                violationsData = [
-                    {
-                        violation_id: 1,
-                        violation_date: '2025-06-20T07:33:00Z',
-                        violation_type: 'Illegal Parking',
-                        violation_description: 'Illegal Parking',
-                        fine_amount: 2000,
-                        payment_status: 'Paid',
-                        officer_name: 'Officer John Doe'
-                    },
-                    {
-                        violation_id: 2,
-                        violation_date: '2025-06-25T07:33:00Z',
-                        violation_type: 'Illegal Turn',
-                        violation_description: 'Illegal Turn',
-                        fine_amount: 500,
-                        payment_status: 'Paid',
-                        officer_name: 'Officer John Doe'
-                    },
-                    {
-                        violation_id: 3,
-                        violation_date: '2025-06-30T07:33:00Z',
-                        violation_type: 'Illegal Turn',
-                        violation_description: 'Illegal Turn',
-                        fine_amount: 500,
-                        payment_status: 'Pending',
-                        officer_name: 'Officer John Doe'
-                    }
-                ];
-            }
-            
-            setViolations(violationsData);
-            
-            // Calculate stats
-            const total = violationsData.length;
-            const pending = violationsData.filter(v => v.payment_status === 'Pending').length;
-            const paid = violationsData.filter(v => v.payment_status === 'Paid').length;
-            
-            setStats({ total, pending, paid });
+            setViolations(response.data);
+            setStats({
+                total: response.data.length,
+
+
+
+                pending: response.data.filter(v => v.payment_status === 'Pending').length,
+                paid: response.data.filter(v => v.payment_status === 'Paid').length                     
+
+
+            });
+            setLoading(false);
         } catch (error) {
             console.error('Error fetching violations:', error);
-            // Show sample data on error
-            const sampleData = [
-                {
-                    violation_id: 1,
-                    violation_date: '2025-06-20T07:33:00Z',
-                    violation_type: 'Illegal Parking',
-                    violation_description: 'Illegal Parking',
-                    fine_amount: 2000,
-                    payment_status: 'Paid',
-                    officer_name: 'Officer John Doe'
-                },
-                {
-                    violation_id: 2,
-                    violation_date: '2025-06-25T07:33:00Z',
-                    violation_type: 'Illegal Turn',
-                    violation_description: 'Illegal Turn',
-                    fine_amount: 500,
-                    payment_status: 'Paid',
-                    officer_name: 'Officer John Doe'
-                },
-                {
-                    violation_id: 3,
-                    violation_date: '2025-06-30T07:33:00Z',
-                    violation_type: 'Illegal Turn',
-                    violation_description: 'Illegal Turn',
-                    fine_amount: 500,
-                    payment_status: 'Pending',
-                    officer_name: 'Officer John Doe'
-                }
-            ];
-            setViolations(sampleData);
-            setStats({ total: 3, pending: 1, paid: 2 });
-        } finally {
             setLoading(false);
         }
     };
+    // Handle logout and redirect to login page
+
+   
+        
+            
+          
 
     const handleLogout = () => {
         localStorage.removeItem('token');
@@ -192,7 +133,8 @@ const UserDashboard = () => {
                     <div className="stats-cards">
                         <div className="stat-card total">
                             <h3>{stats.total}</h3>
-                            <p>Total Violations</p>
+                            <p>Total 
+                                      Violations</p>
                         </div>
                         <div className="stat-card pending">
                             <h3>{stats.pending}</h3>
@@ -217,7 +159,7 @@ const UserDashboard = () => {
                         </div>
                         <div className="profile-details">
                             <div className="detail-item">
-                                <label>Phone</label>
+                                <label>Email</label>
                                 <span>{user?.email || 'netadmin@admin.com'}</span>
                             </div>
                             <div className="detail-item">

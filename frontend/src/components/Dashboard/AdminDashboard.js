@@ -375,7 +375,7 @@ const AdminDashboard = () => {
                                             <i className="fas fa-check"></i>
                                         </div>
                                         <div className="stat-number">{stats.paidPayments || 0}</div>
-                                        <div className="stat-label">{"Paid\nPayments"}</div>
+                                        <div className="stat-label">{"Paid Payments"}</div>
                                     </Card.Body>
                                 </Card>
                             </div>

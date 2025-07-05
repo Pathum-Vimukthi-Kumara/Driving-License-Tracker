@@ -77,18 +77,24 @@
     gap: 1rem;
     margin-bottom: 2rem;
 }
+.admin-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 cards per row */
+    gap: 1.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
 
-/* Stat Cards */
+/* Stat card styles (already in your setup, shown here for clarity) */
 .stat-card {
     background: white;
     border-radius: 8px;
     padding: 1.5rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    border: none;
-    transition: transform 0.2s ease;
     text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
 }
-
 .stat-card:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
@@ -122,6 +128,19 @@
     margin: 0;
     line-height: 1.2;
     white-space: pre-line;
+}
+
+/* Optional: Responsive */
+@media (max-width: 768px) {
+    .admin-stats {
+        grid-template-columns: repeat(2, 1fr); /* 2 cards per row */
+    }
+}
+
+@media (max-width: 480px) {
+    .admin-stats {
+        grid-template-columns: 1fr; /* 1 card per row */
+    }
 }
 
 /* Section Styling */
