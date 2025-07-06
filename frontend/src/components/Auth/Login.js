@@ -50,10 +50,10 @@ const Login = () => {
     };
 
     return (
-        <div className="main-container">
-            <div className="auth-card">
+        <div className="main-container login-container">
+            <div className="auth-card login-card">
                 <div className="auth-header">
-                    <h2>Welcome Back</h2>
+                    <h2>Welcome Back!</h2>
                     <p>Sign in to your account to continue</p>
                 </div>
 

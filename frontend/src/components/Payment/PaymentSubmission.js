@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Card, Form, Button, Alert, Navbar, Nav } from 'react-bootstrap';
 import { violationAPI, paymentAPI } from '../../utils/api';
@@ -19,22 +19,22 @@ const PaymentSubmission = () => {
 
     useEffect(() => {
         fetchViolation();
-    }, [violationId, fetchViolation]);
+    }, [violationId]);
 
-    const fetchViolation = useCallback(async () => {
+    const fetchViolation = async () => {
         try {
             const response = await violationAPI.getById(violationId);
             setViolation(response.data);
-            setPaymentForm({
-                ...paymentForm,
+            setPaymentForm(prevForm => ({
+                ...prevForm,
                 payment_amount: response.data.fine_amount
-            });
+            }));
         } catch (error) {
             setError('Violation not found or access denied');
         } finally {
             setLoading(false);
         }
-    }, [violationId]);
+    };
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
@@ -112,7 +112,9 @@ const PaymentSubmission = () => {
             hour: '2-digit',
             minute: '2-digit'
         });
-    };    const formatCurrency = (amount) => {
+    };
+
+    const formatCurrency = (amount) => {
         return new Intl.NumberFormat('en-LK', {
             style: 'currency',
             currency: 'LKR'

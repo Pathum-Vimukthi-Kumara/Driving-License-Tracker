@@ -69,8 +69,8 @@ const Register = () => {
     };
 
     return (
-        <div className="main-container">
-            <div className="auth-card">
+        <div className="main-container register-container">
+            <div className="auth-card register-card">
                 <div className="auth-header">
                     <h2>Create Account</h2>
                     <p>Register as a citizen to track your violations</p>
