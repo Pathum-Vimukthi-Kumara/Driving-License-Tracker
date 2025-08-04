@@ -28,8 +28,23 @@ if (!dbConfig) {
     console.log('Database config loaded from environment variables');
 }
 
-// Create connection with either JSON config or environment variables
-const connection = mysql.createConnection(dbConfig);
+// Filter out any invalid MySQL connection properties
+const validMySQLOptions = [
+    'host', 'port', 'user', 'password', 'database', 
+    'charset', 'timezone', 'connectTimeout', 'ssl',
+    'debug', 'trace', 'multipleStatements', 'flags'
+];
+
+// Create a clean config with only valid MySQL options
+const cleanDbConfig = {};
+for (const option of validMySQLOptions) {
+    if (dbConfig[option] !== undefined) {
+        cleanDbConfig[option] = dbConfig[option];
+    }
+}
+
+// Create connection with clean config
+const connection = mysql.createConnection(cleanDbConfig);
 
 connection.connect((err) => {
     if (err) {
