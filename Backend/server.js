@@ -1,7 +1,21 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-require('dotenv').config();
+const fs = require('fs');
+
+// Log environment details to help with debugging
+console.log('NODE_ENV:', process.env.NODE_ENV);
+console.log('Working directory:', __dirname);
+console.log('Available files in root:', fs.existsSync(__dirname) ? fs.readdirSync(__dirname) : 'Directory not accessible');
+
+// Load environment variables
+try {
+    require('dotenv').config();
+    console.log('Environment variables loaded. JWT_SECRET exists:', !!process.env.JWT_SECRET);
+    console.log('Database host:', process.env.DB_HOST || '(not set in env)');
+} catch (err) {
+    console.error('Error loading .env file:', err);
+}
 
 // Global error handlers for unhandled errors
 process.on('unhandledRejection', (reason, promise) => {
@@ -14,11 +28,29 @@ process.on('uncaughtException', (error) => {
 
 const app = express();
 
-// Middleware
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// Middleware with error handling
+app.use(cors({
+    origin: ['http://localhost:3000', 'https://driving-license-tracker.vercel.app'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    credentials: true
+}));
+
+// Request parsing with size limits to prevent attacks
+app.use(express.json({ limit: '1mb' }));
+app.use(express.urlencoded({ extended: true, limit: '1mb' }));
+
+// Set up uploads directory with error handling
+try {
+    const uploadsDir = path.join(__dirname, 'uploads');
+    if (!fs.existsSync(uploadsDir)) {
+        console.log('Creating uploads directory');
+        fs.mkdirSync(uploadsDir, { recursive: true });
+    }
+    app.use('/uploads', express.static(uploadsDir));
+    console.log('Uploads directory configured');
+} catch (err) {
+    console.error('Error setting up uploads directory:', err);
+}
 
 // Health check route for Vercel
 app.get('/api/health', (req, res) => {
@@ -29,6 +61,11 @@ app.get('/api/health', (req, res) => {
     });
 });
 
+// Root route for Vercel - catches direct access to backend URL
+app.get('/', (req, res) => {
+    res.status(200).send('Driving License Tracking System API - Server is running');
+});
+
 // Routes with error handling
 try {
     app.use('/api/auth', require('./routes/auth'));
@@ -37,6 +74,7 @@ try {
     app.use('/api/violations', require('./routes/violations'));
     app.use('/api/payments', require('./routes/payments'));
     app.use('/api/admin', require('./routes/admin'));
+    console.log('All routes loaded successfully');
 } catch (error) {
     console.error('Error setting up routes:', error);
 }

@@ -1,7 +1,7 @@
 {
   "version": 2,
-  "name": "driving-license-tracker",
-  "public": true,
+  "buildCommand": "npm run build",
+  "outputDirectory": "frontend/build",
   "builds": [
     {
       "src": "frontend/package.json",
@@ -15,27 +15,38 @@
       "src": "Backend/server.js",
       "use": "@vercel/node",
       "config": {
-        "includeFiles": ["Backend/**/*"]
+        "includeFiles": ["Backend/**"]
       }
     }
-  ],
-  "rewrites": [
-    { "source": "/api/:path*", "destination": "/Backend/server.js" },
-    { "source": "/uploads/:path*", "destination": "/Backend/server.js" }
   ],
   "routes": [
     {
       "src": "/api/(.*)",
-      "headers": { "cache-control": "s-maxage=0" },
       "dest": "/Backend/server.js"
     },
     {
       "src": "/uploads/(.*)",
-      "headers": { "cache-control": "s-maxage=0" },
       "dest": "/Backend/server.js"
     },
-    { "handle": "filesystem" },
-    { "src": "/(.*)", "dest": "/frontend/build/index.html" }
+    {
+      "src": "/static/(.*)",
+      "dest": "/frontend/build/static/$1"
+    },
+    {
+      "src": "/favicon.ico",
+      "dest": "/frontend/build/favicon.ico"
+    },
+    {
+      "src": "/manifest.json",
+      "dest": "/frontend/build/manifest.json"
+    },
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/frontend/build/index.html"
+    }
   ],
   "env": {
     "DB_HOST": "bboai925bg2h7iyfqvwh-mysql.services.clever-cloud.com",

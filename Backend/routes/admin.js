@@ -36,15 +36,21 @@ router.get('/dashboard', authenticateToken, (req, res) => {
 
 // Get all users
 router.get('/users', authenticateToken, (req, res) => {
-    const query = 'SELECT user_id, name, email, phone_number, driving_license_number, address, date_of_birth, registration_date FROM Users ORDER BY registration_date DESC';
-    
-    db.query(query, (err, results) => {
-        if (err) {
-            return res.status(500).json({ message: 'Database error', error: err });
-        }
+    try {
+        const query = 'SELECT user_id, name, email, phone_number, driving_license_number, address, date_of_birth, registration_date FROM Users ORDER BY registration_date DESC';
         
-        res.json(results);
-    });
+        db.query(query, (err, results) => {
+            if (err) {
+                console.error('Database error in /admin/users:', err);
+                return res.status(500).json({ message: 'Database error', error: err.message });
+            }
+            
+            res.json(results);
+        });
+    } catch (error) {
+        console.error('Exception in /admin/users route:', error);
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
 });
 
 // Get all officers

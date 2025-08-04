@@ -43,15 +43,41 @@ for (const option of validMySQLOptions) {
     }
 }
 
-// Create connection with clean config
-const connection = mysql.createConnection(cleanDbConfig);
+// Add a reasonable connection timeout
+if (!cleanDbConfig.connectTimeout) {
+    cleanDbConfig.connectTimeout = 10000; // 10 seconds
+}
 
-connection.connect((err) => {
-    if (err) {
-        console.error('Error connecting to MySQL database:', err);
-        return;
-    }
-    console.log('Connected to MySQL database successfully');
-});
+// Log the database config (without sensitive info)
+console.log('Database connection attempt to:', cleanDbConfig.host);
+
+let connection;
+
+try {
+    // Create connection with clean config
+    connection = mysql.createConnection(cleanDbConfig);
+    
+    // Add reconnection handling
+    connection.on('error', function(err) {
+        console.error('Database error:', err);
+        if (err.code === 'PROTOCOL_CONNECTION_LOST') {
+            console.log('Attempting to reconnect to database...');
+            connection = mysql.createConnection(cleanDbConfig);
+        } else {
+            throw err;
+        }
+    });
+
+    connection.connect((err) => {
+        if (err) {
+            console.error('Error connecting to MySQL database:', err);
+            return;
+        }
+        console.log('Connected to MySQL database successfully');
+    });
+} catch (error) {
+    console.error('Fatal database connection error:', error);
+    // Don't throw the error, just log it - this prevents app crash
+}
 
 module.exports = connection;
