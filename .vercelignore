@@ -1,8 +1,0 @@
-# Vercel ignore file
-
-.git
-.github
-**/*.md
-**/*.log
-node_modules
-**/node_modules
