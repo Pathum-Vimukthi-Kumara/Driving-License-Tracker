@@ -1,0 +1,51 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "frontend/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "build"
+      }
+    },
+    {
+      "src": "Backend/server.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "Backend/server.js"
+    },
+    {
+      "src": "/static/(.*)",
+      "dest": "frontend/build/static/$1"
+    },
+    {
+      "src": "/favicon.ico",
+      "dest": "frontend/build/favicon.ico"
+    },
+    {
+      "src": "/manifest.json",
+      "dest": "frontend/build/manifest.json"
+    },
+    {
+      "src": "/logo192.png",
+      "dest": "frontend/build/logo192.png"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "frontend/build/index.html"
+    }
+  ],
+  "env": {
+    "DB_HOST": "bboai925bg2h7iyfqvwh-mysql.services.clever-cloud.com",
+    "DB_USER": "u5pcka2rnhj9wq1h",
+    "DB_PASSWORD": "gBNlNTNYXhNn47HHFmNI",
+    "DB_NAME": "bboai925bg2h7iyfqvwh",
+    "DB_PORT": "3306",
+    "JWT_SECRET": "project_cat_dog_dog",
+    "NODE_ENV": "production"
+  }
+}
