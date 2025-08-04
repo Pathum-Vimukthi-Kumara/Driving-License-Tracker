@@ -1,23 +1,28 @@
 {
-    "installCommand": "npm install --legency-peer-deps",
+    "installCommand": "npm install --legacy-peer-deps",
     "version": 2,
-    "builds":[
+    "builds": [
         {
-            "src": "index.js",
+            "src": "server.js",
             "use": "@vercel/node"
-
-        },
-        {
-            "src": "src/**/*",
-            "use":"@vercel/static"
         }
     ],
-    "routes":[
+    "routes": [
         {
-            "src": "/(.*)", "dest":"/"
-         }
-        
-    ]
-
-    
+            "src": "/api/(.*)",
+            "dest": "server.js"
+        },
+        {
+            "src": "/uploads/(.*)",
+            "dest": "server.js"
+        }
+    ],
+    "env": {
+        "DB_HOST": "bboai925bg2h7iyfqvwh-mysql.services.clever-cloud.com",
+        "DB_USER": "u5pcka2rnhj9wq1h",
+        "DB_PASSWORD": "gBNlNTNYXhNn47HHFmNI",
+        "DB_NAME": "bboai925bg2h7iyfqvwh",
+        "DB_PORT": "3306",
+        "JWT_SECRET": "project_cat_dog_dog"
+    }
 }
