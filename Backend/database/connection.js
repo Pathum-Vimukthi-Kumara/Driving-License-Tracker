@@ -51,33 +51,45 @@ if (!cleanDbConfig.connectTimeout) {
 // Log the database config (without sensitive info)
 console.log('Database connection attempt to:', cleanDbConfig.host);
 
-let connection;
+// Create a connection pool for better performance and reliability
+const pool = mysql.createPool({
+    ...cleanDbConfig,
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0,
+    enableKeepAlive: true,
+    keepAliveInitialDelay: 0
+});
 
-try {
-    // Create connection with clean config
-    connection = mysql.createConnection(cleanDbConfig);
-    
-    // Add reconnection handling
-    connection.on('error', function(err) {
-        console.error('Database error:', err);
+// Convert to promise-based pool for easier use with async/await
+const promisePool = pool.promise();
+
+// Test the connection
+pool.getConnection((err, connection) => {
+    if (err) {
+        console.error('Error connecting to MySQL database:', err);
         if (err.code === 'PROTOCOL_CONNECTION_LOST') {
-            console.log('Attempting to reconnect to database...');
-            connection = mysql.createConnection(cleanDbConfig);
-        } else {
-            throw err;
+            console.error('Database connection was closed');
         }
-    });
-
-    connection.connect((err) => {
-        if (err) {
-            console.error('Error connecting to MySQL database:', err);
-            return;
+        if (err.code === 'ER_CON_COUNT_ERROR') {
+            console.error('Database has too many connections');
         }
+        if (err.code === 'ECONNREFUSED') {
+            console.error('Database connection was refused');
+        }
+        if (err.code === 'ETIMEDOUT') {
+            console.error('Database connection timed out');
+        }
+    } else {
         console.log('Connected to MySQL database successfully');
-    });
-} catch (error) {
-    console.error('Fatal database connection error:', error);
-    // Don't throw the error, just log it - this prevents app crash
-}
+        connection.release(); // Release connection when done
+    }
+});
 
-module.exports = connection;
+// Handle unexpected errors
+pool.on('error', (err) => {
+    console.error('Unexpected database error:', err);
+    // Attempt to reconnect automatically
+});
+
+module.exports = pool;

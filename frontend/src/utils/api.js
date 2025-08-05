@@ -1,13 +1,19 @@
 import axios from 'axios';
 
-// Use relative path for production, absolute for development
+// Configuration for different environments
 const isProduction = process.env.NODE_ENV === 'production';
-// In production, we don't add /api to the base URL since it's already in the routes
-const API_BASE_URL = isProduction 
-    ? ''  // Empty base URL in production (Vercel) to avoid path duplication
-    : process.env.REACT_APP_API_URL || 'http://localhost:5000'; // Use environment or default in development
 
-console.log('API Base URL:', API_BASE_URL, 'Environment:', process.env.NODE_ENV);
+// In production (Vercel), use relative paths
+// In development, use the full URL from environment or default
+const API_BASE_URL = isProduction 
+    ? ''  // Empty base URL in production to avoid path duplication
+    : process.env.REACT_APP_API_URL || 'http://localhost:5000'; 
+
+console.log('API Configuration:', {
+  baseURL: API_BASE_URL,
+  environment: process.env.NODE_ENV,
+  isProduction
+});
 
 // Create axios instance with default config
 const api = axios.create({

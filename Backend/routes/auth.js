@@ -13,7 +13,8 @@ router.post('/register', async (req, res) => {
         const checkUser = 'SELECT * FROM Users WHERE email = ? OR driving_license_number = ?';
         db.query(checkUser, [email, driving_license_number], async (err, results) => {
             if (err) {
-                return res.status(500).json({ message: 'Database error', error: err });
+                console.error('Database error during user check:', err);
+                return res.status(500).json({ message: 'Database error', error: err.message });
             }
 
             if (results.length > 0) {
@@ -56,6 +57,9 @@ router.post('/register', async (req, res) => {
 // User Login
 router.post('/login', (req, res) => {
     try {
+        console.log('Login attempt received:', req.body);
+        console.log('Request headers:', req.headers);
+        
         const { email, password, userType } = req.body;
 
         let table, query;
@@ -78,10 +82,12 @@ router.post('/login', (req, res) => {
 
         db.query(query, [email], async (err, results) => {
             if (err) {
-                return res.status(500).json({ message: 'Database error', error: err });
+                console.error('Database error during login:', err);
+                return res.status(500).json({ message: 'Database error', error: err.message });
             }
 
             if (results.length === 0) {
+                console.log(`No user found with email: ${email} and type: ${userType}`);
                 return res.status(401).json({ message: 'Invalid credentials' });
             }
 

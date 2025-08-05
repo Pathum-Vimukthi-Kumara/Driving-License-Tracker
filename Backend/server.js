@@ -30,10 +30,16 @@ const app = express();
 
 // Middleware with error handling
 app.use(cors({
-    origin: ['http://localhost:3000', 'https://driving-license-tracker.vercel.app'],
+    origin: ['http://localhost:3000', 'https://driving-license-tracker.vercel.app', 'https://driving-license-tracker-tmrx.vercel.app'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     credentials: true
 }));
+
+// Log all requests for debugging
+app.use((req, res, next) => {
+    console.log(`${req.method} ${req.originalUrl}`);
+    next();
+});
 
 // Request parsing with size limits to prevent attacks
 app.use(express.json({ limit: '1mb' }));
@@ -58,6 +64,16 @@ app.get('/api/health', (req, res) => {
         status: 'ok', 
         message: 'API is running',
         env: process.env.NODE_ENV || 'development' 
+    });
+});
+
+// Special test route for auth POST
+app.post('/api/auth/test', (req, res) => {
+    console.log('POST /api/auth/test route hit!', req.body);
+    res.status(200).json({ 
+        message: 'Auth POST endpoint is working correctly',
+        received: req.body,
+        headers: req.headers
     });
 });
 
