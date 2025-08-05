@@ -68,7 +68,11 @@ app.get('/', (req, res) => {
 
 // Routes with error handling
 try {
-    app.use('/api/auth', require('./routes/auth'));
+    // Mount auth routes both at /api/auth and directly at /auth for compatibility
+    const authRoutes = require('./routes/auth');
+    app.use('/api/auth', authRoutes);
+    app.use('/auth', authRoutes); // Direct access for auth routes
+    
     app.use('/api/users', require('./routes/users'));
     app.use('/api/officers', require('./routes/officers'));
     app.use('/api/violations', require('./routes/violations'));

@@ -1,6 +1,12 @@
 import axios from 'axios';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+// Use relative path for production, absolute for development
+const isProduction = process.env.NODE_ENV === 'production';
+const API_BASE_URL = isProduction 
+    ? '/api'  // Use relative path in production (Vercel)
+    : process.env.REACT_APP_API_URL || 'http://localhost:5000/api'; // Use environment or default in development
+
+console.log('API Base URL:', API_BASE_URL, 'Environment:', process.env.NODE_ENV);
 
 // Create axios instance with default config
 const api = axios.create({
@@ -41,7 +47,7 @@ api.interceptors.response.use(
 
 // Auth API calls
 export const authAPI = {
-    login: (credentials) => api.post('/auth/login', credentials),
+    login: (credentials) => api.post('/api/auth/login', credentials),
     register: (userData) => api.post('/auth/register', userData),
 };
 
