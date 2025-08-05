@@ -2,9 +2,10 @@ import axios from 'axios';
 
 // Use relative path for production, absolute for development
 const isProduction = process.env.NODE_ENV === 'production';
+// In production, we don't add /api to the base URL since it's already in the routes
 const API_BASE_URL = isProduction 
-    ? '/api'  // Use relative path in production (Vercel)
-    : process.env.REACT_APP_API_URL || 'http://localhost:5000/api'; // Use environment or default in development
+    ? ''  // Empty base URL in production (Vercel) to avoid path duplication
+    : process.env.REACT_APP_API_URL || 'http://localhost:5000'; // Use environment or default in development
 
 console.log('API Base URL:', API_BASE_URL, 'Environment:', process.env.NODE_ENV);
 
@@ -47,57 +48,57 @@ api.interceptors.response.use(
 
 // Auth API calls
 export const authAPI = {
-    login: (credentials) => api.post('/auth/login', credentials),
-    register: (userData) => api.post('/auth/register', userData),
+    login: (credentials) => api.post('/api/auth/login', credentials),
+    register: (userData) => api.post('/api/auth/register', userData),
 };
 
 // User API calls
 export const userAPI = {
-    getProfile: () => api.get('/users/profile'),
-    updateProfile: (data) => api.put('/users/profile', data),
-    getViolations: () => api.get('/users/violations'),
+    getProfile: () => api.get('/api/users/profile'),
+    updateProfile: (data) => api.put('/api/users/profile', data),
+    getViolations: () => api.get('/api/users/violations'),
 };
 
 // Officer API calls
 export const officerAPI = {
-    getProfile: () => api.get('/officers/profile'),
-    getViolations: () => api.get('/officers/violations'),
-    searchUser: (licenseNumber) => api.get(`/officers/search-user/${licenseNumber}`),
+    getProfile: () => api.get('/api/officers/profile'),
+    getViolations: () => api.get('/api/officers/violations'),
+    searchUser: (licenseNumber) => api.get(`/api/officers/search-user/${licenseNumber}`),
 };
 
 // Violation API calls
 export const violationAPI = {
-    create: (data) => api.post('/violations', data),
-    getAll: () => api.get('/violations'),
-    getById: (id) => api.get(`/violations/${id}`),
-    updateStatus: (id, status) => api.put(`/violations/${id}/status`, { payment_status: status }),
+    create: (data) => api.post('/api/violations', data),
+    getAll: () => api.get('/api/violations'),
+    getById: (id) => api.get(`/api/violations/${id}`),
+    updateStatus: (id, status) => api.put(`/api/violations/${id}/status`, { payment_status: status }),
 };
 
 // Payment API calls
 export const paymentAPI = {
     submit: (formData) => {
-        return api.post('/payments', formData, {
+        return api.post('/api/payments', formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
         });
     },
-    getAll: () => api.get('/payments'),
-    getByViolation: (violationId) => api.get(`/payments/violation/${violationId}`),
+    getAll: () => api.get('/api/payments'),
+    getByViolation: (violationId) => api.get(`/api/payments/violation/${violationId}`),
 };
 
 // Admin API calls
 export const adminAPI = {
-    getDashboard: () => api.get('/admin/dashboard'),
-    getUsers: () => api.get('/admin/users'),
-    getOfficers: () => api.get('/admin/officers'),
-    createOfficer: (data) => api.post('/admin/officers', data),
-    deleteUser: (id) => api.delete(`/admin/users/${id}`),
-    updateUser: (id, data) => api.put(`/admin/users/${id}`, data),
-    deleteOfficer: (id) => api.delete(`/admin/officers/${id}`),
-    confirmPayment: (id) => api.put(`/admin/payments/${id}/confirm`),
-    getUserViolations: (id) => api.get(`/admin/users/${id}/violations`),
-    getUserProfile: (id) => api.get(`/admin/users/${id}/profile`),
+    getDashboard: () => api.get('/api/admin/dashboard'),
+    getUsers: () => api.get('/api/admin/users'),
+    getOfficers: () => api.get('/api/admin/officers'),
+    createOfficer: (data) => api.post('/api/admin/officers', data),
+    deleteUser: (id) => api.delete(`/api/admin/users/${id}`),
+    updateUser: (id, data) => api.put(`/api/admin/users/${id}`, data),
+    deleteOfficer: (id) => api.delete(`/api/admin/officers/${id}`),
+    confirmPayment: (id) => api.put(`/api/admin/payments/${id}/confirm`),
+    getUserViolations: (id) => api.get(`/api/admin/users/${id}/violations`),
+    getUserProfile: (id) => api.get(`/api/admin/users/${id}/profile`),
 };
 
 export default api;

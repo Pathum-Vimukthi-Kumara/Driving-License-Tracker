@@ -33,6 +33,9 @@
       "dest": "/Backend/server.js"
     },
     {
+      "handle": "filesystem"
+    },
+    {
       "src": "/static/(.*)",
       "dest": "/frontend/build/static/$1"
     },
@@ -46,6 +49,11 @@
     },
     {
       "handle": "filesystem"
+    },
+    {
+      "src": "/api/auth/(.*)",
+      "methods": ["POST", "GET", "PUT", "DELETE", "PATCH", "OPTIONS"],
+      "dest": "/Backend/server.js"
     },
     {
       "src": "/(.*)",
