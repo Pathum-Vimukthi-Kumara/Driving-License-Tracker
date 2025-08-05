@@ -33,11 +33,17 @@ npm install -g vercel
 vercel login
 
 # Deploy to production
-npm run deploy
+npm run deploy:prod
 
 # Or for development/preview deployment
-vercel
+npm run deploy:preview
 ```
+
+After deployment, verify that the API is working:
+
+1. Visit `https://[your-vercel-domain]/test` to check the test endpoint
+2. Check `https://[your-vercel-domain]/api/health` for the health check
+3. Monitor logs with `npm run logs` to debug any issues
 
 ## Project Structure
 
@@ -59,3 +65,13 @@ Make sure to set these environment variables in your .env file for local develop
 - `DB_PASSWORD`: Database password
 - `DB_NAME`: Database name
 - `PORT`: Server port (default: 5000, only used in local development)
+
+## Testing the API
+
+The following endpoints can be used to verify the API is working correctly:
+
+- `/test` - A simple test endpoint that returns request information
+- `/api/health` - Health check endpoint
+- `/` - Root endpoint that confirms the API is running
+
+When deployed to Vercel, you can check the serverless function logs in the Vercel dashboard to debug issues.

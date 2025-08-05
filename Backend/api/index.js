@@ -46,19 +46,29 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Static files
-const uploadsDir = path.join(__dirname, '../uploads');
-if (fs.existsSync(uploadsDir)) {
-    app.use('/uploads', express.static(uploadsDir));
-    console.log('Uploads directory exists and is served statically');
+// Static files - handle differently in production vs development
+if (process.env.NODE_ENV === 'production') {
+    console.log('In production - skipping local file system operations');
+    // In serverless environments, static file handling is different
+    app.use('/uploads', (req, res, next) => {
+        // This is just a placeholder - in production you should use a proper file storage service like S3
+        res.status(404).json({ error: 'File not found in serverless environment' });
+    });
 } else {
-    console.log('Uploads directory does not exist');
-    try {
-        fs.mkdirSync(uploadsDir, { recursive: true });
+    // Local development
+    const uploadsDir = path.join(__dirname, '../uploads');
+    if (fs.existsSync(uploadsDir)) {
         app.use('/uploads', express.static(uploadsDir));
-        console.log('Created uploads directory');
-    } catch (err) {
-        console.error('Failed to create uploads directory:', err);
+        console.log('Uploads directory exists and is served statically');
+    } else {
+        console.log('Uploads directory does not exist');
+        try {
+            fs.mkdirSync(uploadsDir, { recursive: true });
+            app.use('/uploads', express.static(uploadsDir));
+            console.log('Created uploads directory');
+        } catch (err) {
+            console.error('Failed to create uploads directory:', err);
+        }
     }
 }
 
@@ -97,6 +107,24 @@ app.use((err, req, res, next) => {
 app.use((req, res) => {
     res.status(404).json({ error: 'Not Found', path: req.originalUrl });
 });
+
+// Special middleware for debugging in serverless environments
+if (process.env.NODE_ENV === 'production') {
+    app.use((req, res, next) => {
+        req.isServerless = true;
+        req.startTime = Date.now();
+        
+        // Capture original end function to log response info
+        const originalEnd = res.end;
+        res.end = function(...args) {
+            const responseTime = Date.now() - req.startTime;
+            console.log(`[Serverless] Response: ${res.statusCode} in ${responseTime}ms`);
+            return originalEnd.apply(this, args);
+        };
+        
+        next();
+    });
+}
 
 // Export the Express API for serverless use
 module.exports = app;

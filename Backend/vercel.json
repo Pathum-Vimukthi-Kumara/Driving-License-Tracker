@@ -3,17 +3,32 @@
     "name": "driving-license-tracker-backend",
     "builds": [
       { 
-        "src": "api/index.js", 
+        "src": "api/serverless.js", 
         "use": "@vercel/node",
         "config": {
-          "includeFiles": ["**/*"]
+          "includeFiles": ["**/*"],
+          "maxLambdaSize": "50mb"
         }
+      },
+      {
+        "src": "api/test.js",
+        "use": "@vercel/node"
       }
     ],
     "routes": [
       {
+        "src": "/test",
+        "dest": "api/test.js",
+        "methods": ["GET"]
+      },
+      {
+        "src": "/health",
+        "dest": "api/serverless.js",
+        "methods": ["GET"]
+      },
+      {
         "src": "/(.*)",
-        "dest": "api/index.js",
+        "dest": "api/serverless.js",
         "methods": ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
         "headers": {
           "Access-Control-Allow-Origin": "*",
@@ -21,5 +36,13 @@
           "Access-Control-Allow-Methods": "GET,OPTIONS,PATCH,DELETE,POST,PUT"
         }
       }
-    ]
+    ],
+    "env": {
+      "NODE_ENV": "production"
+    },
+    "regions": ["cpt1"],
+    "github": {
+      "silent": true,
+      "autoAlias": true
+    }
 }
