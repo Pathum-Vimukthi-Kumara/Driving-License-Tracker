@@ -40,8 +40,20 @@ const Login = () => {
                 officer: '/officer-dashboard',
                 admin: '/admin-dashboard'
             };
-
-            navigate(redirectMap[user.userType] || '/user-dashboard');
+            
+            console.log('Login successful, user info:', user);
+            
+            // Ensure proper redirect by checking both userType and role
+            let dashboardPath = '/user-dashboard'; // default
+            
+            if (user.userType === 'admin' || user.role === 'admin') {
+                dashboardPath = '/admin-dashboard';
+            } else if (user.userType === 'officer' || user.role === 'officer') {
+                dashboardPath = '/officer-dashboard';
+            }
+            
+            console.log('Redirecting to:', dashboardPath);
+            navigate(dashboardPath);
         } catch (error) {
             setError(error.response?.data?.message || 'Login failed. Please try again.');
         } finally {
@@ -51,7 +63,7 @@ const Login = () => {
 
     return (
         <div className="main-container login-container">
-            <div className="auth-card login-card">
+            <div className="auth-card login-card mobile-login-card">
                 <div className="auth-header">
                     <h2>Welcome Back!</h2>
                     <p>Sign in to your account to continue</p>

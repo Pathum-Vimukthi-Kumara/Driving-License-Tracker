@@ -49,6 +49,14 @@ body {
     overflow: hidden;
 }
 
+@media (max-width: 768px) {
+    .auth-card {
+        min-width: auto;
+        width: 100%;
+        max-width: 500px;
+    }
+}
+
 .auth-card::before {
     content: '';
     position: absolute;
@@ -79,9 +87,72 @@ body {
     border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
+/* Mobile-specific login card styles */
+.mobile-login-card {
+    transition: all 0.3s ease;
+}
+
+@media (max-width: 576px) {
+    .mobile-login-card {
+        padding: 25px 20px;
+        max-width: 90%;
+        margin: 0 auto;
+    }
+}
+
+@media (max-width: 380px) {
+    .mobile-login-card {
+        padding: 18px 15px;
+        max-width: 95%;
+        border-radius: 12px;
+    }
+    
+    .mobile-login-card .auth-header h2 {
+        font-size: 1.3rem;
+        margin-bottom: 5px;
+    }
+    
+    .mobile-login-card .auth-header p {
+        font-size: 0.8rem;
+        margin-bottom: 15px;
+    }
+    
+    .mobile-login-card .form-label {
+        font-size: 0.85rem;
+    }
+    
+    .mobile-login-card .form-control {
+        padding: 8px 12px;
+        font-size: 0.9rem;
+    }
+    
+    .mobile-login-card .btn-primary {
+        padding: 8px 12px;
+        font-size: 0.9rem;
+    }
+    
+    .mobile-login-card .auth-links {
+        margin-top: 15px;
+        padding-top: 15px;
+        font-size: 0.8rem;
+    }
+}
+
 .auth-header {
     text-align: center;
     margin-bottom: 30px;
+}
+
+@media (max-width: 576px) {
+    .auth-header {
+        margin-bottom: 20px;
+    }
+}
+
+@media (max-width: 380px) {
+    .auth-header {
+        margin-bottom: 15px;
+    }
 }
 
 .auth-header h2 {
@@ -145,6 +216,14 @@ body {
     backdrop-filter: blur(10px);
 }
 
+@media (max-width: 576px) {
+    .login-card .form-control {
+        padding: 10px 12px;
+        font-size: 14px;
+        border-radius: 8px;
+    }
+}
+
 .form-control:focus {
     outline: none;
     border-color: #667eea;
@@ -186,6 +265,14 @@ body {
     font-weight: 600;
     backdrop-filter: blur(10px);
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 576px) {
+    .login-card .btn-primary {
+        padding: 10px 15px;
+        font-size: 0.95rem;
+        border-radius: 8px;
+    }
 }
 
 .login-card .btn-primary:hover {
@@ -296,11 +383,56 @@ body {
 @media (max-width: 768px) {
     .main-container {
         padding: 10px;
+        align-items: center;
     }
     
     .auth-card {
         padding: 30px 20px;
         margin: 0 10px;
+    }
+    
+    .login-container {
+        justify-content: center;
+        padding-right: 0;
+    }
+    
+    .form-control {
+        padding: 10px 14px;
+        font-size: 14px;
+    }
+    
+    .btn-primary {
+        padding: 10px 20px;
+        font-size: 15px;
+    }
+}
+
+@media (max-width: 576px) {
+    .main-container {
+        padding: 15px 10px;
+    }
+    
+    .form-group {
+        margin-bottom: 15px;
+    }
+    
+    .form-label {
+        margin-bottom: 6px;
+        font-size: 0.9rem;
+    }
+    
+    .auth-header h2 {
+        font-size: 1.5rem;
+    }
+    
+    .auth-header p {
+        font-size: 0.9rem;
+    }
+    
+    .auth-links {
+        margin-top: 20px;
+        padding-top: 20px;
+        font-size: 0.9rem;
     }
 }
 

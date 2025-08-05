@@ -7,8 +7,19 @@ import '../../styles/officer-dashboard.css';
 const OfficerDashboard = () => {
     const [officer, setOfficer] = useState(null);
     const [violations, setViolations] = useState([]);
-    const [searchResult, setSearchResult] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [searchResult, setSearchResult] = useState(nul                            <div className="table-responsive">
+                                <Table striped hover>
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Driver</th>
+                                            <th>License</th>
+                                            <th>Violation Type</th>
+                                            <th>Fine Amount</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>t [loading, setLoading] = useState(true);
     const [searchLoading, setSearchLoading] = useState(false);
     const [submitLoading, setSubmitLoading] = useState(false);
     const [error, setError] = useState('');

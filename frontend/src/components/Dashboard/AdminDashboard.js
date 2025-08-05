@@ -39,6 +39,15 @@ const AdminDashboard = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
+        // Check if user is admin before fetching data
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        
+        if (user.userType !== 'admin' && user.role !== 'admin') {
+            setError('You do not have admin privileges to access this dashboard');
+            setLoading(false);
+            return;
+        }
+        
         fetchDashboardData();
         fetchUsers();
         fetchOfficers();
@@ -48,10 +57,14 @@ const AdminDashboard = () => {
 
     const fetchDashboardData = async () => {
         try {
+            setLoading(true);
             const response = await adminAPI.getDashboard();
             setStats(response.data);
         } catch (error) {
             console.error('Error fetching dashboard data:', error);
+            setError('Failed to load dashboard data. Please check your connection and permissions.');
+        } finally {
+            setLoading(false);
         }
     };
 

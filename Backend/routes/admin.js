@@ -6,6 +6,14 @@ const router = express.Router();
 
 // Get dashboard statistics
 router.get('/dashboard', authenticateToken, (req, res) => {
+    // Check if user is admin
+    if (req.user.userType !== 'admin' && req.user.role !== 'admin') {
+        console.log('Unauthorized access attempt to admin dashboard:', req.user);
+        return res.status(403).json({ message: 'Access forbidden: Admin privileges required' });
+    }
+    
+    console.log('Admin dashboard access by:', req.user);
+    
     const queries = {
         totalUsers: 'SELECT COUNT(*) as count FROM Users',
         totalOfficers: 'SELECT COUNT(*) as count FROM Officers',

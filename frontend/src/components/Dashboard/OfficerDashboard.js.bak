@@ -1,0 +1,1579 @@
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Navbar, Nav, Container, Card, Form, Button, Alert, Table, Badge, Modal } from 'react-bootstrap';
+import { officerAPI, violationAPI, adminAPI } from '../../utils/api';
+import '../../styles/officer-dashboard.css';
+
+const OfficerDashboard = () => {
+    const [officer, setOfficer] = useState(null);
+    const [violations, setViolations] = useState([]);
+    const [searchResult, setSearchResult] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [searchLoading, setSearchLoading] = useState(false);
+    const [submitLoading, setSubmitLoading] = useState(false);
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
+    const [licenseSearch, setLicenseSearch] = useState('');
+    const [showUserProfileModal, setShowUserProfileModal] = useState(false);
+    const [showViolationModal, setShowViolationModal] = useState(false);
+    const [selectedUserProfile, setSelectedUserProfile] = useState(null);
+    const [selectedViolation, setSelectedViolation] = useState(null);
+    const [userViolations, setUserViolations] = useState([]);
+
+    const [violationForm, setViolationForm] = useState({
+        violation_type: '',
+        violation_description: '',
+        fine_amount: '',
+        citizen_name: ''
+    });
+    const navigate = useNavigate();
+
+    const violationTypes = [
+        'Speeding',
+        'Running Red Light',
+        'Illegal Parking',
+        'Reckless Driving',
+        'DUI/DWI',
+        'No License',
+        'Expired License',
+        'No Insurance',
+        'Illegal Turn',
+        'Other'
+    ];
+
+    useEffect(() => {
+        fetchOfficerData();
+        fetchViolations();
+    }, []);
+
+    const fetchOfficerData = async () => {
+        try {
+            const response = await officerAPI.getProfile();
+            setOfficer(response.data);
+        } catch (error) {
+            console.error('Error fetching officer data:', error);
+        }
+    };
+
+    const fetchViolations = async () => {
+        try {
+            const response = await officerAPI.getViolations();
+            setViolations(response.data);
+        } catch (error) {
+            console.error('Error fetching violations:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        navigate('/login');
+    };
+
+    const handleLicenseSearch = async (e) => {
+        e.preventDefault();
+        if (!licenseSearch.trim()) return;
+        
+        setSearchLoading(true);
+        setError('');
+        setSearchResult(null);
+
+        try {
+            const response = await officerAPI.searchUser(licenseSearch.trim());
+            setSearchResult(response.data);
+        } catch (error) {
+            setError(error.response?.data?.message || 'User not found with this license number');
+        } finally {
+            setSearchLoading(false);
+        }
+    };
+
+    const handleViolationSubmit = async (e) => {
+        e.preventDefault();
+        if (!searchResult) {
+            setError('Please search for a user first');
+            return;
+        }
+
+        setSubmitLoading(true);
+        setError('');
+        setSuccess('');
+
+        try {
+            let violationData;
+            
+            if (searchResult.is_registered) {
+                violationData = {
+                    user_id: searchResult.user_id,
+                    ...violationForm
+                };
+            } else {
+                violationData = {
+                    driving_license_number: searchResult.driving_license_number,
+                    citizen_name: violationForm.citizen_name || 'Unknown',
+                    ...violationForm
+                };
+            }
+
+            await violationAPI.create(violationData);
+            
+            if (searchResult.is_registered) {
+                setSuccess('Violation filed successfully for registered citizen!');
+            } else {
+                setSuccess('Violation filed successfully! The citizen will see this violation when they register.');
+            }
+            
+            // Reset form
+            setViolationForm({
+                violation_type: '',
+                violation_description: '',
+                fine_amount: '',
+                citizen_name: ''
+            });
+            setSearchResult(null);
+            setLicenseSearch('');
+            
+            // Refresh violations list
+            fetchViolations();
+        } catch (error) {
+            setError(error.response?.data?.message || 'Failed to file violation');
+        } finally {
+            setSubmitLoading(false);
+        }
+    };
+
+    const formatDate = (dateString) => {
+        return new Date(dateString).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    };
+
+    const formatCurrency = (amount) => {
+        return new Intl.NumberFormat('en-LK', {
+            style: 'currency',
+            currency: 'LKR'
+        }).format(amount);
+    };
+
+    const handleViewUserProfile = async (userId) => {
+        try {
+            const response = await adminAPI.getUserProfile(userId);
+            setSelectedUserProfile(response.data.user);
+            setUserViolations(response.data.violations || []);
+            setShowUserProfileModal(true);
+        } catch (error) {
+            setError('Failed to load user profile');
+        }
+    };
+
+    const handleCloseUserProfileModal = () => {
+        setShowUserProfileModal(false);
+        setSelectedUserProfile(null);
+        setUserViolations([]);
+    };
+
+    const handleViewViolationDetails = (violation) => {
+        setSelectedViolation(violation);
+        setShowViolationModal(true);
+    };
+
+    const handleCloseViolationModal = () => {
+        setShowViolationModal(false);
+        setSelectedViolation(null);
+    };
+
+    if (loading) {
+        return (
+            <div className="loading-container">
+                <div className="loading-spinner"></div>
+            </div>
+        );
+    }
+
+    return (
+        <div className="officer-dashboard">
+            <Navbar expand="lg" className="officer-navbar">
+                <Container>
+                    <Navbar.Brand>
+                        <i className="fas fa-shield-alt me-2"></i>
+                        Officer Dashboard
+                    </Navbar.Brand>
+                    <Navbar.Toggle aria-controls="basic-navbar-nav" />
+                    <Navbar.Collapse id="basic-navbar-nav">
+                        <Nav className="ms-auto">
+                            <Nav.Link onClick={handleLogout} style={{ cursor: 'pointer' }}>
+                                <i className="fas fa-sign-out-alt me-1"></i>
+                                Logout
+                            </Nav.Link>
+                        </Nav>
+                    </Navbar.Collapse>
+                </Container>
+            </Navbar>
+
+            <div className="officer-content">
+                <Container>
+                    {/* Officer Header */}
+                    <div className="officer-header">
+                        <div className="officer-title">
+                            <h1>
+                                <i className="fas fa-shield-alt"></i>
+                                Traffic Officer Dashboard
+                            </h1>
+                            <div className="officer-info">
+                                <i className="fas fa-user-circle"></i>
+                                Officer {officer?.name || 'Loading...'}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Stats Row */}
+                    <div className="officer-stats-row">
+                        <Card className="officer-stat-card">
+                            <Card.Body>
+                                <div className="officer-stat-icon">
+                                    <i className="fas fa-exclamation-triangle"></i>
+                                </div>
+                                <div className="officer-stat-number">{violations.length}</div>
+                                <div className="officer-stat-label">Total\nViolations Filed</div>
+                            </Card.Body>
+                        </Card>
+                        
+                        <Card className="officer-stat-card">
+                            <Card.Body>
+                                <div className="officer-stat-icon">
+                                    <i className="fas fa-clock"></i>
+                                </div>
+                                <div className="officer-stat-number">
+                                    {violations.filter(v => v.payment_status === 'Pending').length}
+                                </div>
+                                <div className="officer-stat-label">Pending\nPayments</div>
+                            </Card.Body>
+                        </Card>
+                        
+                        <Card className="officer-stat-card">
+                            <Card.Body>
+                                <div className="officer-stat-icon">
+                                    <i className="fas fa-check-circle"></i>
+                                </div>
+                                <div className="officer-stat-number">
+                                    {violations.filter(v => v.payment_status === 'Paid').length}
+                                </div>
+                                <div className="officer-stat-label">Resolved\nViolations</div>
+                            </Card.Body>
+                        </Card>
+                        
+                        <Card className="officer-stat-card">
+                            <Card.Body>
+                                <div className="officer-stat-icon">
+                                    <i className="fas fa-money-bill-wave"></i>
+                                </div>
+                                <div className="officer-stat-number">
+                                    {violations.reduce((sum, v) => sum + (v.payment_status === 'Paid' ? parseFloat(v.fine_amount) : 0), 0).toFixed(0)}
+                                </div>
+                                <div className="officer-stat-label">Total Fines\nCollected (LKR)</div>
+                            </Card.Body>
+                        </Card>
+                    </div>
+
+                    {/* Dashboard Grid */}
+                    <div className="dashboard-grid">
+                        {/* License Search */}
+                        <div className="license-search-section">
+                            <h3>
+                                <i className="fas fa-search"></i>
+                                License Verification
+                            </h3>
+                            
+                            <Form onSubmit={handleLicenseSearch} className="search-form">
+                                <Form.Control
+                                    type="text"
+                                    placeholder="Enter License Number (e.g., L001234567)"
+                                    value={licenseSearch}
+                                    onChange={(e) => setLicenseSearch(e.target.value)}
+                                    required
+                                />
+                                <Button type="submit" className="search-btn" disabled={searchLoading}>
+                                    {searchLoading ? (
+                                        <>
+                                            <i className="fas fa-spinner fa-spin me-1"></i>
+                                            Searching...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <i className="fas fa-search me-1"></i>
+                                            Search
+                                        </>
+                                    )}
+                                </Button>
+                            </Form>
+
+                            {/* Search Results */}
+                            {searchResult && (
+                                <div className="search-results">
+                                    <div className="user-info-card">
+                                        <h5 className="mb-3">
+                                            {searchResult.is_registered ? (
+                                                <><i className="fas fa-check-circle text-success me-2"></i>Registered Driver</>
+                                            ) : (
+                                                <><i className="fas fa-exclamation-triangle text-warning me-2"></i>Unregistered Driver</>
+                                            )}
+                                        </h5>
+                                        
+                                        <div className="user-info-grid">
+                                            <div className="user-info-item">
+                                                <label>License Number</label>
+                                                <span>{searchResult.driving_license_number}</span>
+                                            </div>
+                                            {searchResult.is_registered && (
+                                                <>
+                                                    <div className="user-info-item">
+                                                        <label>Name</label>
+                                                        <span>{searchResult.name}</span>
+                                                    </div>
+                                                    <div className="user-info-item">
+                                                        <label>Email</label>
+                                                        <span>{searchResult.email}</span>
+                                                    </div>
+                                                    <div className="user-info-item">
+                                                        <label>Phone</label>
+                                                        <span>{searchResult.phone_number}</span>
+                                                    </div>
+                                                </>
+                                            )}
+                                        </div>
+                                        
+                                        {searchResult.previous_violations && searchResult.previous_violations.length > 0 && (
+                                            <div className="mt-3">
+                                                <small className="text-muted">
+                                                    <i className="fas fa-history me-1"></i>
+                                                    {searchResult.previous_violations.length} previous violation(s) on record
+                                                </small>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Quick Actions */}
+                        <div className="quick-actions-section">
+                            <h3>
+                                <i className="fas fa-bolt"></i>
+                                Quick Actions
+                            </h3>
+                            
+                            <div className="quick-actions">
+                                <a href="#license-search" className="quick-action-btn">
+                                    <i className="fas fa-search"></i>
+                                    <span>Verify License</span>
+                                </a>
+                                
+                                <a href="#recent-violations" className="quick-action-btn">
+                                    <i className="fas fa-list"></i>
+                                    <span>View Violations</span>
+                                </a>
+                                
+                                <a href="#new-violation" className="quick-action-btn">
+                                    <i className="fas fa-plus-circle"></i>
+                                    <span>File Violation</span>
+                                </a>
+                                
+                                <a href="#reports" className="quick-action-btn">
+                                    <i className="fas fa-chart-bar"></i>
+                                    <span>Reports</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Violation Form */}
+                    {searchResult && (
+                        <div className="license-search-section" id="new-violation">
+                            <h3>
+                                <i className="fas fa-file-alt"></i>
+                                File New Violation
+                            </h3>
+                            
+                            <Form onSubmit={handleViolationSubmit}>
+                                <div className="row g-3 mb-3">
+                                    {!searchResult.is_registered && (
+                                        <div className="col-md-6">
+                                            <Form.Group>
+                                                <Form.Label>Citizen Name</Form.Label>
+                                                <Form.Control
+                                                    type="text"
+                                                    placeholder="Enter citizen's full name"
+                                                    value={violationForm.citizen_name}
+                                                    onChange={(e) => setViolationForm({
+                                                        ...violationForm,
+                                                        citizen_name: e.target.value
+                                                    })}
+                                                    required={!searchResult.is_registered}
+                                                />
+                                            </Form.Group>
+                                        </div>
+                                    )}
+                                    
+                                    <div className="col-md-6">
+                                        <Form.Group>
+                                            <Form.Label>Violation Type</Form.Label>
+                                            <Form.Select
+                                                value={violationForm.violation_type}
+                                                onChange={(e) => setViolationForm({
+                                                    ...violationForm,
+                                                    violation_type: e.target.value
+                                                })}
+                                                required
+                                            >
+                                                <option value="">Select violation type</option>
+                                                {violationTypes.map((type) => (
+                                                    <option key={type} value={type}>{type}</option>
+                                                ))}
+                                            </Form.Select>
+                                        </Form.Group>
+                                    </div>
+
+                                    <div className="col-md-6">
+                                        <Form.Group>
+                                            <Form.Label>Fine Amount (LKR)</Form.Label>
+                                            <Form.Control
+                                                type="number"
+                                                step="0.01"
+                                                min="0"
+                                                placeholder="Enter fine amount"
+                                                value={violationForm.fine_amount}
+                                                onChange={(e) => setViolationForm({
+                                                    ...violationForm,
+                                                    fine_amount: e.target.value
+                                                })}
+                                                required
+                                            />
+                                        </Form.Group>
+                                    </div>
+                                </div>
+
+                                <Form.Group className="mb-3">
+                                    <Form.Label>Violation Description</Form.Label>
+                                    <Form.Control
+                                        as="textarea"
+                                        rows={3}
+                                        placeholder="Provide detailed description of the violation..."
+                                        value={violationForm.violation_description}
+                                        onChange={(e) => setViolationForm({
+                                            ...violationForm,
+                                            violation_description: e.target.value
+                                        })}
+                                        required
+                                    />
+                                </Form.Group>
+
+                                <Button
+                                    type="submit"
+                                    className="search-btn"
+                                    disabled={submitLoading}
+                                >
+                                    {submitLoading ? (
+                                        <>
+                                            <i className="fas fa-spinner fa-spin me-1"></i>
+                                            Filing Violation...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <i className="fas fa-file-alt me-1"></i>
+                                            File Violation
+                                        </>
+                                    )}
+                                </Button>
+                            </Form>
+                        </div>
+                    )}
+
+                    {/* Alerts */}
+                    {error && (
+                        <Alert variant="danger" dismissible onClose={() => setError('')}>
+                            <i className="fas fa-exclamation-circle me-2"></i>
+                            {error}
+                        </Alert>
+                    )}
+                    
+                    {success && (
+                        <Alert variant="success" dismissible onClose={() => setSuccess('')}>
+                            <i className="fas fa-check-circle me-2"></i>
+                            {success}
+                        </Alert>
+                    )}
+
+                    {/* Recent Violations */}
+                    <div className="recent-violations-section" id="recent-violations">
+                        <h3>
+                            <i className="fas fa-history"></i>
+                            Recent Violations Filed ({violations.length})
+                        </h3>
+                        
+                        {violations.length === 0 ? (
+                            <div className="text-center py-5">
+                                <i className="fas fa-inbox fa-3x text-muted mb-3"></i>
+                                <p className="text-muted">No violations filed yet.</p>
+                            </div>
+                        ) : (
+                            <div className="table-responsive">
+                                <Table striped hover>
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Driver</th>
+                                            <th>License</th>
+                                            <th>Violation</th>
+                                            <th>Fine Amount</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {violations.slice(0, 10).map((violation) => (
+                                            <tr key={violation.violation_id}>
+                                                <td>{formatDate(violation.violation_date)}</td>
+                                                <td>
+                                                    <div>
+                                                        <strong>{violation.user_name || violation.citizen_name}</strong>
+                                                        {violation.user_status === 'Unregistered' && (
+                                                            <div>
+                                                                <Badge bg="warning" className="mt-1">Unregistered</Badge>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </td>
+                                                <td><code>{violation.driving_license_number}</code></td>
+                                                <td>
+                                                    <div>
+                                                        <strong>{violation.violation_type}</strong>
+                                                        {violation.violation_description && (
+                                                            <div>
+                                                                <small className="text-muted">
+                                                                    {violation.violation_description.length > 50
+                                                                        ? `${violation.violation_description.substring(0, 50)}...`
+                                                                        : violation.violation_description
+                                                                    }
+                                                                </small>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </td>
+                                                <td><strong>{formatCurrency(violation.fine_amount)}</strong></td>
+                                                <td>
+                                                    <Badge 
+                                                        bg={violation.payment_status === 'Paid' ? 'success' : 'warning'}
+                                                    >
+                                                        {violation.payment_status}
+                                                    </Badge>
+                                                </td>
+                                                <td>
+                                                    <div className="action-buttons">
+                                                        <Button
+                                                            variant="outline-info"
+                                                            size="sm"
+                                                            onClick={() => handleViewViolationDetails(violation)}
+                                                            className="me-1"
+                                                        >
+                                                            <i className="fas fa-eye"></i>
+                                                        </Button>
+                                                        {violation.user_id && (
+                                                            <Button
+                                                                variant="outline-primary"
+                                                                size="sm"
+                                                                onClick={() => handleViewUserProfile(violation.user_id)}
+                                                            >
+                                                                <i className="fas fa-user"></i>
+                                                            </Button>
+                                                        )}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </Table>
+                            </div>
+                        )}
+                    </div>
+                </Container>
+            </div>
+
+            {/* Modals */}
+            <Modal show={showViolationModal} onHide={handleCloseViolationModal} size="lg">
+                <Modal.Header closeButton>
+                    <Modal.Title>Violation Details</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {selectedViolation && (
+                        <div>
+                            <h5>Violation #{selectedViolation.violation_id}</h5>
+                            <p><strong>Date:</strong> {formatDate(selectedViolation.violation_date)}</p>
+                            <p><strong>Type:</strong> {selectedViolation.violation_type}</p>
+                            <p><strong>Description:</strong> {selectedViolation.violation_description}</p>
+                            <p><strong>Fine Amount:</strong> {formatCurrency(selectedViolation.fine_amount)}</p>
+                            <p><strong>Status:</strong> <Badge bg={selectedViolation.payment_status === 'Paid' ? 'success' : 'warning'}>{selectedViolation.payment_status}</Badge></p>
+                        </div>
+                    )}
+                </Modal.Body>
+            </Modal>
+
+            <Modal show={showUserProfileModal} onHide={handleCloseUserProfileModal} size="lg">
+                <Modal.Header closeButton>
+                    <Modal.Title>User Profile</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {selectedUserProfile && (
+                        <div>
+                            <h5>{selectedUserProfile.name}</h5>
+                            <p><strong>License:</strong> {selectedUserProfile.driving_license_number}</p>
+                            <p><strong>Email:</strong> {selectedUserProfile.email}</p>
+                            <p><strong>Phone:</strong> {selectedUserProfile.phone_number}</p>
+                            {userViolations.length > 0 && (
+                                <div>
+                                    <h6>Violations ({userViolations.length})</h6>
+                                    <Table size="sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Date</th>
+                                                <th>Type</th>
+                                                <th>Fine</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {userViolations.map((violation) => (
+                                                <tr key={violation.violation_id}>
+                                                    <td>{formatDate(violation.violation_date)}</td>
+                                                    <td>{violation.violation_type}</td>
+                                                    <td>{formatCurrency(violation.fine_amount)}</td>
+                                                    <td>
+                                                        <Badge bg={violation.payment_status === 'Paid' ? 'success' : 'warning'}>
+                                                            {violation.payment_status}
+                                                        </Badge>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </Table>
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </Modal.Body>
+            </Modal>
+        </div>
+    );
+};
+
+export default OfficerDashboard;
+            
+            if (searchResult.is_registered) {
+                // For registered users
+                violationData = {
+                    user_id: searchResult.user_id,
+                    ...violationForm
+                };
+            } else {
+                // For unregistered users
+                violationData = {
+                    driving_license_number: searchResult.driving_license_number,
+                    citizen_name: violationForm.citizen_name || 'Unknown',
+                    ...violationForm
+                };
+            }
+
+            await violationAPI.create(violationData);
+            
+            if (searchResult.is_registered) {
+                setSuccess('Violation filed successfully for registered citizen!');
+            } else {
+                setSuccess('Violation filed successfully! The citizen will see this violation when they register.');
+            }
+            
+            // Reset form
+            setViolationForm({
+                violation_type: '',
+                violation_description: '',
+                fine_amount: '',
+                citizen_name: ''
+            });
+            setSearchResult(null);
+            setLicenseSearch('');
+            
+            // Refresh violations list
+            fetchViolations();
+        } catch (error) {
+            setError(error.response?.data?.message || 'Failed to file violation');
+        } finally {
+            setSubmitLoading(false);
+        }
+    };
+
+    const formatDate = (dateString) => {
+        return new Date(dateString).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    };    const formatCurrency = (amount) => {
+        return new Intl.NumberFormat('en-LK', {
+            style: 'currency',
+            currency: 'LKR'
+        }).format(amount);
+    };
+
+    const handleViewUserProfile = async (userId) => {
+        try {
+            const response = await adminAPI.getUserProfile(userId);
+            setSelectedUserProfile(response.data.user);
+            setUserViolations(response.data.violations || []);
+            setShowUserProfileModal(true);
+        } catch (error) {
+            setError('Failed to load user profile');
+        }
+    };
+
+    const handleCloseUserProfileModal = () => {
+        setShowUserProfileModal(false);
+        setSelectedUserProfile(null);
+        setUserViolations([]);
+    };    const handleViewViolationDetails = (violation) => {
+        setSelectedViolation(violation);
+        setShowViolationModal(true);
+    };
+
+    const handleCloseViolationModal = () => {
+        setShowViolationModal(false);
+        setSelectedViolation(null);
+    };
+    
+    const handleViewCitizenProfile = async (violation) => {
+        try {
+            if (violation.user_id) {
+                // For registered users, get their profile and violations
+                const response = await adminAPI.getUserProfile(violation.user_id);
+                if (response.data && response.data.user) {
+                    setSelectedUserProfile(response.data.user);
+                    setUserViolations(response.data.violations || []);
+                    setShowUserProfileModal(true);
+                } else {
+                    setError('Failed to load user profile');
+                }
+            } else {
+                // For unregistered users, search by license number to get all violations for this license
+                const response = await officerAPI.searchUser(violation.driving_license_number);
+                
+                // Create a profile for unregistered user with available information
+                const mockProfile = {
+                    name: violation.user_name || violation.citizen_name || 'Unknown',
+                    driving_license_number: violation.driving_license_number,
+                    email: 'Not registered',
+                    phone_number: 'Not registered',
+                    date_of_birth: null,
+                    address: 'Not registered',
+                    registration_date: null,
+                    user_id: null
+                };
+                setSelectedUserProfile(mockProfile);
+                setUserViolations(response.data?.violations || [violation]);
+                setShowUserProfileModal(true);
+            }
+        } catch (error) {
+            console.error('Error fetching citizen profile:', error);
+            setError('Failed to load citizen profile. Please try again.');
+            
+            // If all else fails, create a basic profile from violation data
+            const basicProfile = {
+                name: violation.user_name || violation.citizen_name || 'Unknown',
+                driving_license_number: violation.driving_license_number,
+                email: 'Not available',
+                phone_number: 'Not available',
+                date_of_birth: null,
+                address: 'Not available',
+                registration_date: null,
+                user_id: violation.user_id || null
+            };
+            setSelectedUserProfile(basicProfile);
+            setUserViolations([violation]); // Show at least this violation
+            setShowUserProfileModal(true);
+        }
+    };
+
+    if (loading) {
+        return (
+            <div className="loading-container">
+                <div className="loading-spinner"></div>
+            </div>
+        );
+    }
+
+    return (
+        <div className="officer-dashboard">
+            <Navbar expand="lg" className="officer-navbar">
+                <Container>
+                    <Navbar.Brand>
+                        <i className="fas fa-user-shield me-2"></i>
+                        Citizen
+                    </Navbar.Brand>
+                    <Navbar.Toggle aria-controls="basic-navbar-nav" />
+                    <Navbar.Collapse id="basic-navbar-nav">
+                        <Nav className="ms-auto">
+                            <Nav.Link onClick={handleLogout} style={{ cursor: 'pointer' }}>
+                                Logout
+                            </Nav.Link>
+                        </Nav>
+                    </Navbar.Collapse>
+                </Container>
+            </Navbar>
+
+            <div className="officer-content">
+                <Container>
+                    {/* Welcome Section */}
+                    <div className="officer-welcome">
+                        <h2>Welcome back, pathum!</h2>
+                        <p>Here's an overview of your driving license status and violations.</p>
+                    </div>
+
+                    {/* Stats Cards */}
+                    <div className="officer-stats">
+                        <Card className="officer-stat-card">
+                            <Card.Body>
+                                <div className="officer-stat-number">7</div>
+                                <div className="officer-stat-label">Total Violations</div>
+                            </Card.Body>
+                        </Card>
+                        
+                        <Card className="officer-stat-card">
+                            <Card.Body>
+                                <div className="officer-stat-number">1</div>
+                                <div className="officer-stat-label">Pending Payments</div>
+                            </Card.Body>
+                        </Card>
+                        
+                        <Card className="officer-stat-card">
+                            <Card.Body>
+                                <div className="officer-stat-number">6</div>
+                                <div className="officer-stat-label">Paid Violations</div>
+                            </Card.Body>
+                        </Card>
+                    </div>
+
+                    {/* Profile Card */}
+                    <div className="profile-card">
+                        <div className="profile-header">
+                            <div className="profile-avatar">P</div>
+                            <div className="profile-info">
+                                <h3>pathum</h3>
+                                <p>License: L001234568</p>
+                            </div>
+                        </div>
+                        <div className="profile-details">
+                            <div className="profile-detail">
+                                <div className="profile-detail-label">Phone</div>
+                                <div className="profile-detail-value">netadmin@admin.com</div>
+                            </div>
+                            <div className="profile-detail">
+                                <div className="profile-detail-label">Date of Birth</div>
+                                <div className="profile-detail-value">6/20/2025</div>
+                            </div>
+                            <div className="profile-detail">
+                                <div className="profile-detail-label">Address</div>
+                                <div className="profile-detail-value">Balpatiya, Galle District</div>
+                            </div>
+                        </div>
+                    </div>
+                                                <h6 className="mb-0">✅ Registered Driver Found:</h6>
+                                                <Button 
+                                                    variant="outline-info" 
+                                                    size="sm"
+                                                    onClick={() => handleViewUserProfile(searchResult.user_id)}
+                                                >
+                                                    <i className="fas fa-user"></i> View Profile
+                                                </Button>
+                                            </div>
+                                            <div className="user-info">
+                                                <div className="user-info-item">
+                                                    <label>Name</label>
+                                                    <span>{searchResult.name}</span>
+                                                </div>
+                                                <div className="user-info-item">
+                                                    <label>Email</label>
+                                                    <span>{searchResult.email}</span>
+                                                </div>
+                                                <div className="user-info-item">
+                                                    <label>Phone</label>
+                                                    <span>{searchResult.phone_number}</span>
+                                                </div>
+                                                <div className="user-info-item">
+                                                    <label>License Number</label>
+                                                    <span>{searchResult.driving_license_number}</span>
+                                                </div>
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <h6>⚠️ Unregistered Driver:</h6>
+                                            <div className="alert alert-info">
+                                                <p><strong>License Number:</strong> {searchResult.driving_license_number}</p>
+                                                <p className="mb-0">{searchResult.message}</p>
+                                            </div>
+                                        </>                                    )}
+                                </div>
+                            )}
+
+                            {/* Previous Violations Section */}
+                            {searchResult && searchResult.previous_violations && searchResult.previous_violations.length > 0 && (
+                                <div className="previous-violations-section fade-in">
+                                    <h6>📋 Previous Violations ({searchResult.previous_violations.length})</h6>
+                                    <div className="violations-table">
+                                        <Table size="sm" className="mb-0">
+                                            <thead>
+                                                <tr>
+                                                    <th>Date</th>
+                                                    <th>Type</th>
+                                                    <th>Fine</th>
+                                                    <th>Status</th>
+                                                    <th>Officer</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {searchResult.previous_violations.map((violation) => (
+                                                    <tr key={violation.violation_id}>
+                                                        <td>{new Date(violation.violation_date).toLocaleDateString()}</td>
+                                                        <td>{violation.violation_type}</td>
+                                                        <td>{formatCurrency(violation.fine_amount)}</td>
+                                                        <td>
+                                                            <Badge 
+                                                                bg={violation.payment_status === 'Paid' ? 'success' : 'warning'}
+                                                                size="sm"
+                                                            >
+                                                                {violation.payment_status}
+                                                            </Badge>
+                                                        </td>
+                                                        <td>{violation.officer_name}</td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </Table>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Violation Form */}
+                        {searchResult && (
+                            <Card className="fade-in">
+                                <Card.Header>
+                                    <h5>Step 2: Violation Details</h5>
+                                </Card.Header>
+                                <Card.Body>                                    <Form onSubmit={handleViolationSubmit}>
+                                        <div className="form-row">
+                                            {!searchResult.is_registered && (
+                                                <Form.Group>
+                                                    <Form.Label>Citizen Name</Form.Label>
+                                                    <Form.Control
+                                                        type="text"
+                                                        placeholder="Enter citizen's full name"
+                                                        value={violationForm.citizen_name}
+                                                        onChange={(e) => setViolationForm({
+                                                            ...violationForm,
+                                                            citizen_name: e.target.value
+                                                        })}
+                                                        required={!searchResult.is_registered}
+                                                    />
+                                                </Form.Group>
+                                            )}
+                                            
+                                            <Form.Group>
+                                                <Form.Label>Violation Type</Form.Label>
+                                                <Form.Select
+                                                    value={violationForm.violation_type}
+                                                    onChange={(e) => setViolationForm({
+                                                        ...violationForm,
+                                                        violation_type: e.target.value
+                                                    })}
+                                                    required
+                                                >
+                                                    <option value="">Select violation type</option>
+                                                    {violationTypes.map((type) => (
+                                                        <option key={type} value={type}>{type}</option>
+                                                    ))}
+                                                </Form.Select>
+                                            </Form.Group>
+
+                                            <Form.Group>
+                                                <Form.Label>Fine Amount (LKR)</Form.Label>
+                                                <Form.Control
+                                                    type="number"
+                                                    step="0.01"
+                                                    min="0"
+                                                    placeholder="Enter fine amount"
+                                                    value={violationForm.fine_amount}
+                                                    onChange={(e) => setViolationForm({
+                                                        ...violationForm,
+                                                        fine_amount: e.target.value
+                                                    })}
+                                                    required
+                                                />
+                                            </Form.Group>
+                                        </div>
+
+                                        <Form.Group>
+                                            <Form.Label>Violation Description</Form.Label>
+                                            <Form.Control
+                                                as="textarea"
+                                                rows={4}
+                                                placeholder="Provide detailed description of the violation..."
+                                                value={violationForm.violation_description}
+                                                onChange={(e) => setViolationForm({
+                                                    ...violationForm,
+                                                    violation_description: e.target.value
+                                                })}
+                                                required
+                                            />
+                                        </Form.Group>
+
+                                        <Button
+                                            type="submit"
+                                            className="btn-officer-primary"
+                                            disabled={submitLoading}
+                                        >
+                                            {submitLoading ? 'Filing Violation...' : 'File Violation'}
+                                        </Button>
+                                    </Form>
+                                </Card.Body>
+                            </Card>
+                        )}
+                    </div>
+
+                    {/* Violations List */}
+                    <div className="violations-list" id="my-violations">
+                        <h3>Violations Filed by Me ({violations.length})</h3>
+                        
+                        {violations.length === 0 ? (
+                            <div className="text-center py-5">
+                                <p className="text-muted">No violations filed yet.</p>
+                            </div>
+                        ) : (
+                            <div className="table-responsive">                                <Table striped bordered hover>
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Driver</th>
+                                            <th>License</th>
+                                            <th>Status</th>
+                                            <th>Violation</th>
+                                            <th>Fine</th>
+                                            <th>Payment</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {violations.map((violation) => (
+                                            <tr key={violation.violation_id}>
+                                                <td>{formatDate(violation.violation_date)}</td>
+                                                <td>
+                                                    <div>
+                                                        <strong>{violation.user_name}</strong>
+                                                        {violation.user_status === 'Unregistered' && (
+                                                            <>
+                                                                <br />
+                                                                <Badge bg="warning" className="mt-1">Unregistered</Badge>
+                                                            </>
+                                                        )}
+                                                    </div>
+                                                </td>
+                                                <td>{violation.driving_license_number}</td>
+                                                <td>
+                                                    <Badge bg={violation.user_status === 'Registered' ? 'success' : 'warning'}>
+                                                        {violation.user_status === 'Registered' ? '✓ Registered' : '⚠ Unregistered'}
+                                                    </Badge>
+                                                </td>
+                                                <td>
+                                                    <div>
+                                                        <strong>{violation.violation_type}</strong>
+                                                        <br />
+                                                        <small className="text-muted">
+                                                            {violation.violation_description?.length > 50
+                                                                ? `${violation.violation_description.substring(0, 50)}...`
+                                                                : violation.violation_description
+                                                            }
+                                                        </small>
+                                                    </div>
+                                                </td>
+                                                <td><strong>{formatCurrency(violation.fine_amount)}</strong></td>
+                                                <td>
+                                                    <div>
+                                                        <Badge 
+                                                            bg={violation.payment_status === 'Paid' ? 'success' : 'warning'}
+                                                        >
+                                                            {violation.payment_status}
+                                                        </Badge>
+                                                        {violation.payment_date && (
+                                                            <div>
+                                                                <small className="text-success">
+                                                                    Paid on {formatDate(violation.payment_date)}
+                                                                </small>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </td>                                                <td>
+                                                    <div className="action-buttons">
+                                                        <Button
+                                                            variant="outline-info"
+                                                            size="sm"
+                                                            onClick={() => handleViewViolationDetails(violation)}
+                                                            className="me-2 mb-1"
+                                                        >
+                                                            <i className="fas fa-eye"></i> Details
+                                                        </Button>
+                                                        <Button
+                                                            variant="outline-primary"
+                                                            size="sm"
+                                                            onClick={() => handleViewCitizenProfile(violation)}
+                                                            className="mb-1"
+                                                        >
+                                                            <i className="fas fa-user"></i> 
+                                                            {violation.user_status === 'Registered' ? ' Profile' : ' Record'}
+                                                        </Button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </Table></div>
+                        )}
+                    </div>                </Container>            {/* Violation Details Modal */}
+            <Modal show={showViolationModal} onHide={handleCloseViolationModal} size="lg">
+                <Modal.Header closeButton>
+                    <Modal.Title>Violation Details</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {selectedViolation && (
+                        <div className="violation-details">
+                            {/* Header Section - Violation ID and Status */}
+                            <div className="violation-header mb-4">
+                                <div className="row align-items-center">
+                                    <div className="col-md-6">
+                                        <h5 className="text-primary mb-0">Violation #{selectedViolation.violation_id}</h5>
+                                        <small className="text-muted">
+                                            {formatDate(selectedViolation.violation_date)}, {new Date(selectedViolation.violation_date).toLocaleTimeString('en-US', { 
+                                                hour: 'numeric', 
+                                                minute: '2-digit', 
+                                                hour12: true 
+                                            })}
+                                        </small>
+                                    </div>
+                                    <div className="col-md-6 text-end">
+                                        <Badge 
+                                            bg={selectedViolation.payment_status === 'Paid' ? 'success' : selectedViolation.payment_status === 'Pending' ? 'warning' : 'danger'}
+                                            className="fs-6 px-3 py-2"
+                                        >
+                                            {selectedViolation.payment_status || 'Pending'}
+                                        </Badge>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Main Information Grid */}
+                            <div className="row mb-4">
+                                <div className="col-md-6">
+                                    <div className="info-card">
+                                        <h6 className="info-card-title">👤 Driver Information</h6>
+                                        <div className="info-item">
+                                            <span className="info-label">Name:</span>
+                                            <span className="info-value"><strong>{selectedViolation.user_name || selectedViolation.citizen_name || 'N/A'}</strong></span>
+                                        </div>
+                                        <div className="info-item">
+                                            <span className="info-label">License Number:</span>
+                                            <span className="info-value">{selectedViolation.driving_license_number}</span>
+                                        </div>
+                                        <div className="info-item">
+                                            <span className="info-label">Violation Type:</span>
+                                            <span className="info-value"><strong>{selectedViolation.violation_type}</strong></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="col-md-6">
+                                    <div className="info-card">
+                                        <h6 className="info-card-title">⚖️ Violation Details</h6>
+                                        <div className="info-item">
+                                            <span className="info-label">Type:</span>
+                                            <span className="info-value text-danger"><strong>{selectedViolation.violation_type}</strong></span>
+                                        </div>
+                                        <div className="info-item">
+                                            <span className="info-label">Fine Amount:</span>
+                                            <span className="info-value text-danger"><strong>{formatCurrency(selectedViolation.fine_amount)}</strong></span>
+                                        </div>
+                                        <div className="info-item">
+                                            <span className="info-label">Issued By:</span>
+                                            <span className="info-value">Officer {officer?.officer_name || 'Unknown'}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            {/* Description Section */}
+                            {selectedViolation.violation_description && (
+                                <div className="row mb-4">
+                                    <div className="col-12">
+                                        <div className="info-card">
+                                            <h6 className="info-card-title">📋 Description</h6>
+                                            <div className="violation-description-text">
+                                                {selectedViolation.violation_description}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Payment Information */}
+                            {selectedViolation.payment_date && (
+                                <div className="row mb-4">
+                                    <div className="col-12">
+                                        <div className="info-card">
+                                            <h6 className="info-card-title">💰 Payment Information</h6>
+                                            <div className="row">
+                                                <div className="col-md-6">
+                                                    <div className="info-item">
+                                                        <span className="info-label">Payment Date:</span>
+                                                        <span className="info-value">{formatDate(selectedViolation.payment_date)}</span>
+                                                    </div>
+                                                </div>
+                                                <div className="col-md-6">
+                                                    <div className="info-item">
+                                                        <span className="info-label">Amount Paid:</span>
+                                                        <span className="info-value text-success"><strong>{formatCurrency(selectedViolation.payment_amount || selectedViolation.fine_amount)}</strong></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Payment Status Information */}
+                            <div className="row">
+                                <div className="col-12">
+                                    {selectedViolation.payment_status === 'Paid' ? (
+                                        <div className="status-card registered">
+                                            <i className="fas fa-check-circle"></i>
+                                            <strong>Payment Status:</strong> Full amount paid ({formatCurrency(selectedViolation.fine_amount)})
+                                        </div>
+                                    ) : (
+                                        <div className="status-card unregistered">
+                                            <i className="fas fa-clock"></i>
+                                            <strong>Payment Status:</strong> Payment pending ({formatCurrency(selectedViolation.fine_amount)})
+                                        </div>
+                                    )}
+                                </div>
+                            </div>                        </div>
+                    )}
+                </Modal.Body>
+                <Modal.Footer>
+                    {selectedViolation && selectedViolation.payment_status !== 'Paid' && (
+                        <Button variant="success">
+                            <i className="fas fa-check me-2"></i>
+                            Mark as Paid
+                        </Button>
+                    )}
+                    <Button variant="outline-secondary" onClick={handleCloseViolationModal}>
+                        <i className="fas fa-times me-2"></i>
+                        Close
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
+                {/* User Profile Modal */}
+                <Modal show={showUserProfileModal} onHide={handleCloseUserProfileModal} size="xl">
+                    <Modal.Header closeButton>
+                        <Modal.Title>User Profile & Violations</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        {selectedUserProfile && (
+                            <div className="user-profile-details">
+                                {/* Header Section */}
+                                <div className="violation-header mb-4">
+                                    <div className="row align-items-center">
+                                        <div className="col-md-8">
+                                            <h4 className="text-primary mb-0">{selectedUserProfile.name}</h4>
+                                            <small className="text-muted">License: {selectedUserProfile.driving_license_number}</small>
+                                        </div>
+                                        <div className="col-md-4 text-end">
+                                            <Badge 
+                                                bg="info"
+                                                className="fs-6 px-3 py-2"
+                                            >
+                                                {userViolations.length} Violations
+                                            </Badge>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* User Information Cards */}
+                                <div className="row mb-4">
+                                    <div className="col-md-6">
+                                        <div className="info-card">
+                                            <h6 className="info-card-title">👤 Personal Information</h6>
+                                            <div className="info-item">
+                                                <span className="info-label">Full Name:</span>
+                                                <span className="info-value"><strong>{selectedUserProfile.name}</strong></span>
+                                            </div>
+                                            <div className="info-item">
+                                                <span className="info-label">Email:</span>
+                                                <span className="info-value">{selectedUserProfile.email}</span>
+                                            </div>
+                                            <div className="info-item">
+                                                <span className="info-label">Phone:</span>
+                                                <span className="info-value">{selectedUserProfile.phone_number}</span>
+                                            </div>
+                                            <div className="info-item">
+                                                <span className="info-label">Date of Birth:</span>
+                                                <span className="info-value">
+                                                    {selectedUserProfile.date_of_birth ? 
+                                                        new Date(selectedUserProfile.date_of_birth).toLocaleDateString() : 
+                                                        'Not provided'
+                                                    }
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="col-md-6">
+                                        <div className="info-card">
+                                            <h6 className="info-card-title">🚗 License Information</h6>
+                                            <div className="info-item">
+                                                <span className="info-label">License Number:</span>
+                                                <span className="info-value"><strong>{selectedUserProfile.driving_license_number}</strong></span>
+                                            </div>
+                                            <div className="info-item">
+                                                <span className="info-label">Registration Date:</span>
+                                                <span className="info-value">{formatDate(selectedUserProfile.registration_date)}</span>
+                                            </div>
+                                            {selectedUserProfile.address && (
+                                                <div className="info-item">
+                                                    <span className="info-label">Address:</span>
+                                                    <span className="info-value">{selectedUserProfile.address}</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Violations History */}
+                                <div className="row mb-4">
+                                    <div className="col-12">
+                                        <div className="info-card">
+                                            <h6 className="info-card-title">⚖️ Violations History ({userViolations.length})</h6>
+                                            {userViolations.length === 0 ? (
+                                                <div className="status-card registered">
+                                                    <i className="fas fa-check-circle"></i>
+                                                    <strong>Clean Record:</strong> This user has no violations on record.
+                                                </div>
+                                            ) : (
+                                                <div className="table-responsive mt-3">
+                                                    <Table className="violation-history-table" size="sm">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Date</th>
+                                                                <th>Type</th>
+                                                                <th>Description</th>
+                                                                <th>Fine</th>
+                                                                <th>Status</th>
+                                                                <th>Officer</th>
+                                                                <th>Payment</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {userViolations.map((violation) => (
+                                                                <tr key={violation.violation_id}>
+                                                                    <td><small>{formatDate(violation.violation_date)}</small></td>
+                                                                    <td><strong>{violation.violation_type}</strong></td>
+                                                                    <td>
+                                                                        <div className="violation-desc">
+                                                                            <small>{violation.violation_description.length > 40 
+                                                                                ? `${violation.violation_description.substring(0, 40)}...`
+                                                                                : violation.violation_description
+                                                                            }</small>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td><strong><small>{formatCurrency(violation.fine_amount)}</small></strong></td>
+                                                                    <td>
+                                                                        {violation.payment_status === 'Paid' ? (
+                                                                            <Badge bg="success" size="sm">Paid</Badge>
+                                                                        ) : violation.payment_submitted ? (
+                                                                            <Badge bg="info" size="sm">Pending</Badge>
+                                                                        ) : (
+                                                                            <Badge bg="warning" size="sm">Unpaid</Badge>
+                                                                        )}
+                                                                    </td>
+                                                                    <td><small>{violation.officer_name}</small></td>
+                                                                    <td>
+                                                                        {violation.payment_amount ? (
+                                                                            <div>
+                                                                                <div><strong><small>{formatCurrency(violation.payment_amount)}</small></strong></div>
+                                                                                <small className="text-muted" style={{fontSize: '0.7rem'}}>
+                                                                                    {formatDate(violation.payment_date)}
+                                                                                </small>
+                                                                                {violation.receipt_file && (
+                                                                                    <div>
+                                                                                        <a 
+                                                                                            href={`http://localhost:5000/uploads/receipts/${violation.receipt_file}`}
+                                                                                            target="_blank"
+                                                                                            rel="noopener noreferrer"
+                                                                                            className="btn btn-sm btn-outline-primary mt-1"
+                                                                                            style={{fontSize: '0.7rem', padding: '0.25rem 0.5rem'}}
+                                                                                        >
+                                                                                            Receipt
+                                                                                        </a>
+                                                                                    </div>
+                                                                                )}
+                                                                            </div>
+                                                                        ) : (
+                                                                            <small className="text-muted">No payment</small>
+                                                                        )}
+                                                                    </td>
+                                                                </tr>
+                                                            ))}
+                                                        </tbody>
+                                                    </Table>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Summary Statistics */}
+                                {userViolations.length > 0 && (
+                                    <div className="row">
+                                        <div className="col-12">
+                                            <div className="info-card">
+                                                <h6 className="info-card-title">📊 Summary Statistics</h6>
+                                                <div className="row">
+                                                    <div className="col-md-3">
+                                                        <div className="summary-card">
+                                                            <div className="summary-number text-primary">{userViolations.length}</div>
+                                                            <div className="summary-label">Total Violations</div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="col-md-3">
+                                                        <div className="summary-card">
+                                                            <div className="summary-number text-success">
+                                                                {userViolations.filter(v => v.payment_status === 'Paid').length}
+                                                            </div>
+                                                            <div className="summary-label">Paid</div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="col-md-3">
+                                                        <div className="summary-card">
+                                                            <div className="summary-number text-warning">
+                                                                {userViolations.filter(v => v.payment_status === 'Pending').length}
+                                                            </div>
+                                                            <div className="summary-label">Pending</div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="col-md-3">
+                                                        <div className="summary-card">
+                                                            <div className="summary-number text-danger" style={{fontSize: '1.2rem'}}>
+                                                                {formatCurrency(userViolations.filter(v => v.payment_status === 'Pending').reduce((sum, v) => sum + parseFloat(v.fine_amount), 0))}
+                                                            </div>
+                                                            <div className="summary-label">Outstanding</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={handleCloseUserProfileModal}>
+                            Close
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
+            </div>
+
+            {/* Violations Table */}
+            <div className="violations-section">
+                <div className="violations-header">
+                    <h4>Violation History</h4>
+                </div>
+                <div className="table-responsive">
+                    <table className="violations-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Violation</th>
+                                <th>Description</th>
+                                <th>Fine amount</th>
+                                <th>Status</th>
+                                <th>Officer</th>
+                                <th>Payment</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Jun 20, 2025, 07:33 AM</td>
+                                <td>Illegal Parking</td>
+                                <td>Illegal Parking</td>
+                                <td>2000</td>
+                                <td><span className="status-badge paid">Paid</span></td>
+                                <td>Officer John Doe</td>
+                                <td>Paid 2000</td>
+                                <td>
+                                    <div className="action-buttons">
+                                        <button className="action-btn view">View</button>
+                                        <button className="action-btn edit">Edit</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Jun 25, 2025, 07:33 AM</td>
+                                <td>Illegal Turn</td>
+                                <td>Illegal Turn</td>
+                                <td>500</td>
+                                <td><span className="status-badge paid">Paid</span></td>
+                                <td>Officer John Doe</td>
+                                <td>Paid 500</td>
+                                <td>
+                                    <div className="action-buttons">
+                                        <button className="action-btn view">View</button>
+                                        <button className="action-btn edit">Edit</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Jun 30, 2025, 07:33 AM</td>
+                                <td>Illegal Turn</td>
+                                <td>Illegal Turn</td>
+                                <td>500</td>
+                                <td><span className="status-badge pending">Pending</span></td>
+                                <td>Officer John Doe</td>
+                                <td>Pending</td>
+                                <td>
+                                    <div className="action-buttons">
+                                        <button className="action-btn view">View</button>
+                                        <button className="action-btn edit">Edit</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default OfficerDashboard;

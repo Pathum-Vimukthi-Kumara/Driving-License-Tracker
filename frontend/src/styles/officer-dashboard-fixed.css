@@ -106,47 +106,11 @@
         grid-template-columns: repeat(2, 1fr) !important;
         gap: 1rem !important;
     }
-    
-    .officer-dashboard .recent-violations-section h3 {
-        font-size: 1.2rem;
-    }
-    
-    .officer-dashboard .table td,
-    .officer-dashboard .table th {
-        font-size: 0.85rem;
-        padding: 0.5rem !important;
-    }
-    
-    .officer-dashboard .action-buttons .btn {
-        padding: 0.25rem 0.4rem;
-        font-size: 0.75rem;
-    }
 }
 
 @media (max-width: 480px) {
     .officer-dashboard .officer-stats-row {
         grid-template-columns: 1fr !important;
-    }
-    
-    .officer-dashboard .officer-content {
-        padding: 0.75rem;
-    }
-    
-    .officer-dashboard .recent-violations-section {
-        padding: 0.75rem;
-    }
-    
-    .officer-dashboard .search-section {
-        padding: 1rem;
-    }
-    
-    .officer-dashboard .search-form {
-        flex-direction: column;
-    }
-    
-    .officer-dashboard .search-form .form-control {
-        margin-right: 0;
-        margin-bottom: 0.5rem;
     }
 }
 
@@ -775,19 +739,6 @@
         text-align: center;
     }
     
-    .officer-dashboard .officer-content {
-        padding: 1rem 0.5rem;
-    }
-    
-    .officer-dashboard .violations-section,
-    .officer-dashboard .search-section {
-        padding: 1rem;
-    }
-    
-    .officer-dashboard .officer-title h1 {
-        font-size: 1.4rem;
-    }
-    
     .profile-avatar {
         margin-right: 0;
         margin-bottom: 1rem;
@@ -827,9 +778,8 @@
 
 .officer-dashboard .table-responsive {
     border-radius: 8px;
-    overflow-x: auto;
+    overflow: hidden;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    position: relative;
 }
 
 /* Badge Styling */
@@ -837,33 +787,6 @@
     font-size: 0.75rem !important;
     padding: 0.5rem 0.75rem !important;
     font-weight: 500 !important;
-}
-
-/* Mobile scroll hint */
-.mobile-scroll-hint {
-    display: none;
-    text-align: center;
-    padding: 8px;
-    background-color: rgba(254, 111, 51, 0.1);
-    color: #FE6F33;
-    font-size: 0.85rem;
-    margin-top: 5px;
-    border-radius: 5px;
-}
-
-/* Table container with horizontal scroll */
-.table-responsive-container {
-    position: relative;
-    margin-bottom: 1rem;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-}
-
-@media (max-width: 768px) {
-    .mobile-scroll-hint {
-        display: block;
-    }
 }
 
 /* Button Styling */

@@ -43,11 +43,21 @@ api.interceptors.response.use(
         return response;
     },
     (error) => {
+        console.error('API Error Response:', error.response?.status, error.message);
+        
         if (error.response?.status === 401) {
+            console.warn('Unauthorized access - redirecting to login');
             localStorage.removeItem('token');
             localStorage.removeItem('user');
             window.location.href = '/login';
+        } 
+        else if (error.response?.status === 403) {
+            console.warn('Forbidden access - may need higher privileges');
         }
+        else if (error.response?.status === 500) {
+            console.error('Server error:', error.response?.data);
+        }
+        
         return Promise.reject(error);
     }
 );
