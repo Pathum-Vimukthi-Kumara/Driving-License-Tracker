@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Navbar, Nav, Container, Card, Table, Badge, Button, Modal, Form, Alert } from 'react-bootstrap';
 import { adminAPI, violationAPI, paymentAPI } from '../../utils/api';
 import '../../styles/admin-dashboard.css';
+import '../../styles/modal-styles.css';
 
 const AdminDashboard = () => {
     const [stats, setStats] = useState({});
@@ -14,6 +15,12 @@ const AdminDashboard = () => {
     const [showViolationModal, setShowViolationModal] = useState(false);    const [showUserModal, setShowUserModal] = useState(false);
     const [showPaymentModal, setShowPaymentModal] = useState(false);
     const [showUserProfileModal, setShowUserProfileModal] = useState(false);
+    const [showDeleteUserModal, setShowDeleteUserModal] = useState(false);
+    const [showDeleteOfficerModal, setShowDeleteOfficerModal] = useState(false);
+    const [showConfirmPaymentModal, setShowConfirmPaymentModal] = useState(false);
+    const [userToDelete, setUserToDelete] = useState(null);
+    const [officerToDelete, setOfficerToDelete] = useState(null);
+    const [paymentToConfirm, setPaymentToConfirm] = useState(null);
     const [selectedViolation, setSelectedViolation] = useState(null);
     const [selectedUser, setSelectedUser] = useState(null);
     const [selectedPayment, setSelectedPayment] = useState(null);
@@ -132,15 +139,19 @@ const AdminDashboard = () => {
         } catch (error) {
             setError(error.response?.data?.message || 'Failed to create officer');
         }
-    };    const handleDeleteUser = async (userId) => {
-        if (window.confirm('Are you sure you want to delete this user?')) {
-            try {
-                await adminAPI.deleteUser(userId);
-                setSuccess('User deleted successfully!');
-                fetchUsers();
-            } catch (error) {
-                setError(error.response?.data?.message || 'Failed to delete user');
-            }
+    };    const handleDeleteUserConfirm = (userId) => {
+        setUserToDelete(userId);
+        setShowDeleteUserModal(true);
+    };
+    
+    const confirmDeleteUser = async () => {
+        try {
+            await adminAPI.deleteUser(userToDelete);
+            setSuccess('User deleted successfully!');
+            setShowDeleteUserModal(false);
+            fetchUsers();
+        } catch (error) {
+            setError(error.response?.data?.message || 'Failed to delete user');
         }
     };
 
@@ -198,15 +209,19 @@ const AdminDashboard = () => {
         setUserViolations([]);
     };
 
-    const handleDeleteOfficer = async (officerId) => {
-        if (window.confirm('Are you sure you want to delete this officer?')) {
-            try {
-                await adminAPI.deleteOfficer(officerId);
-                setSuccess('Officer deleted successfully!');
-                fetchOfficers();
-            } catch (error) {
-                setError(error.response?.data?.message || 'Failed to delete officer');
-            }
+    const handleDeleteOfficerConfirm = (officerId) => {
+        setOfficerToDelete(officerId);
+        setShowDeleteOfficerModal(true);
+    };
+    
+    const confirmDeleteOfficer = async () => {
+        try {
+            await adminAPI.deleteOfficer(officerToDelete);
+            setSuccess('Officer deleted successfully!');
+            setShowDeleteOfficerModal(false);
+            fetchOfficers();
+        } catch (error) {
+            setError(error.response?.data?.message || 'Failed to delete officer');
         }
     };    const handleUpdateViolationStatus = async (violationId, status) => {
         try {
@@ -236,16 +251,20 @@ const AdminDashboard = () => {
         setSelectedPayment(null);
     };
 
-    const handleConfirmPayment = async (paymentId) => {
-        if (window.confirm('Are you sure you want to confirm this payment?')) {
-            try {
-                await adminAPI.confirmPayment(paymentId);
-                setSuccess('Payment confirmed successfully!');
-                fetchPayments();
-                fetchViolations(); // Refresh violations to update status
-            } catch (error) {
-                setError(error.response?.data?.message || 'Failed to confirm payment');
-            }
+    const handleConfirmPaymentPrompt = (paymentId) => {
+        setPaymentToConfirm(paymentId);
+        setShowConfirmPaymentModal(true);
+    };
+    
+    const confirmPayment = async () => {
+        try {
+            await adminAPI.confirmPayment(paymentToConfirm);
+            setSuccess('Payment confirmed successfully!');
+            setShowConfirmPaymentModal(false);
+            fetchPayments();
+            fetchViolations(); // Refresh violations to update status
+        } catch (error) {
+            setError(error.response?.data?.message || 'Failed to confirm payment');
         }
     };
 
@@ -442,7 +461,7 @@ const AdminDashboard = () => {
                                                         <Button
                                                             size="sm"
                                                             variant="danger"
-                                                            onClick={() => handleDeleteUser(user.user_id)}
+                                                            onClick={() => handleDeleteUserConfirm(user.user_id)}
                                                         >
                                                             Delete
                                                         </Button>
@@ -496,7 +515,7 @@ const AdminDashboard = () => {
                                                         <Button
                                                             size="sm"
                                                             variant="danger"
-                                                            onClick={() => handleDeleteOfficer(officer.officer_id)}
+                                                            onClick={() => handleDeleteOfficerConfirm(officer.officer_id)}
                                                         >
                                                             Delete
                                                         </Button>
@@ -637,7 +656,7 @@ const AdminDashboard = () => {
                                                             <Button
                                                                 size="sm"
                                                                 variant="success"
-                                                                onClick={() => handleConfirmPayment(payment.payment_id)}
+                                                                onClick={() => handleConfirmPaymentPrompt(payment.payment_id)}
                                                             >
                                                                 Confirm
                                                             </Button>
@@ -1195,7 +1214,7 @@ const AdminDashboard = () => {
                             variant="success"
                             onClick={() => {
                                 handleClosePaymentModal();
-                                handleConfirmPayment(selectedPayment.payment_id);
+                                handleConfirmPaymentPrompt(selectedPayment.payment_id);
                             }}
                         >
                             Confirm Payment
@@ -1342,6 +1361,81 @@ const AdminDashboard = () => {
                     )}
                     <Button variant="secondary" onClick={handleCloseViolationModal}>
                         Close
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
+            {/* Delete User Confirmation Modal */}
+            <Modal 
+                show={showDeleteUserModal} 
+                onHide={() => setShowDeleteUserModal(false)} 
+                centered 
+                size="sm"
+                contentClassName="confirm-modal"
+                backdrop="static"
+            >
+                <Modal.Header closeButton>
+                    <Modal.Title>Confirm Delete</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <p className="mb-0">Are you sure you want to delete this user?</p>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowDeleteUserModal(false)}>
+                        Cancel
+                    </Button>
+                    <Button variant="danger" onClick={confirmDeleteUser}>
+                        OK
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
+            {/* Delete Officer Confirmation Modal */}
+            <Modal 
+                show={showDeleteOfficerModal} 
+                onHide={() => setShowDeleteOfficerModal(false)} 
+                centered 
+                size="sm"
+                contentClassName="confirm-modal"
+                backdrop="static"
+            >
+                <Modal.Header closeButton>
+                    <Modal.Title>Confirm Delete</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <p className="mb-0">Are you sure you want to delete this officer?</p>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowDeleteOfficerModal(false)}>
+                        Cancel
+                    </Button>
+                    <Button variant="danger" onClick={confirmDeleteOfficer}>
+                        OK
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+            
+            {/* Confirm Payment Modal */}
+            <Modal 
+                show={showConfirmPaymentModal} 
+                onHide={() => setShowConfirmPaymentModal(false)} 
+                centered 
+                size="sm"
+                contentClassName="confirm-modal"
+                backdrop="static"
+            >
+                <Modal.Header closeButton>
+                    <Modal.Title>Confirm Payment</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <p className="mb-0">Are you sure you want to confirm this payment?</p>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowConfirmPaymentModal(false)}>
+                        Cancel
+                    </Button>
+                    <Button variant="success" onClick={confirmPayment}>
+                        OK
                     </Button>
                 </Modal.Footer>
             </Modal>

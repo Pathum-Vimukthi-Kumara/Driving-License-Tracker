@@ -384,10 +384,7 @@ const OfficerDashboard = () => {
                                     <span>File Violation</span>
                                 </a>
                                 
-                                <a href="#reports" className="quick-action-btn">
-                                    <i className="fas fa-chart-bar"></i>
-                                    <span>Reports</span>
-                                </a>
+                              
                             </div>
                         </div>
                     </div>
