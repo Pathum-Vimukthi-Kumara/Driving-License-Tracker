@@ -25,17 +25,19 @@ router.get('/dashboard', authenticateToken, (req, res) => {
     
     const results = {};
     let completed = 0;
-    
+    let responseSent = false;
+
     Object.keys(queries).forEach(key => {
         db.query(queries[key], (err, result) => {
+            if (responseSent) return;
             if (err) {
+                responseSent = true;
                 return res.status(500).json({ message: 'Database error', error: err });
             }
-            
             results[key] = result[0].count;
             completed++;
-            
-            if (completed === Object.keys(queries).length) {
+            if (completed === Object.keys(queries).length && !responseSent) {
+                responseSent = true;
                 res.json(results);
             }
         });

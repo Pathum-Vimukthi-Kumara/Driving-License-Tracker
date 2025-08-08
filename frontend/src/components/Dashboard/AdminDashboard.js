@@ -614,7 +614,7 @@ const AdminDashboard = () => {
                                                 <td><strong>{formatCurrency(payment.payment_amount)}</strong></td>                                                <td>
                                                     {payment.receipt_file && (
                                                         <a 
-                                                            href={`http://REACT_APP_API_URL/uploads/receipts/${payment.receipt_file}`}
+                                                            href={`${process.env.REACT_APP_API_URL}/uploads/receipts/${payment.receipt_file}`}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
                                                             className="btn btn-sm btn-outline-primary"
@@ -981,7 +981,7 @@ const AdminDashboard = () => {
                                                                             {violation.receipt_file && (
                                                                                 <div>
                                                                                     <a 
-                                                                                        href={`http://REACT_APP_API_URL/uploads/receipts/${violation.receipt_file}`}
+                                                                                        href={`${process.env.REACT_APP_API_URL}/uploads/receipts/${violation.receipt_file}`}
                                                                                         target="_blank"
                                                                                         rel="noopener noreferrer"
                                                                                         className="btn btn-sm btn-outline-primary mt-1"
@@ -1143,7 +1143,7 @@ const AdminDashboard = () => {
                                                 <div className="info-value">
                                                     <div className="receipt-section">
                                                         <a 
-                                                            href={`http://REACT_APP_API_URL/uploads/receipts/${selectedPayment.receipt_file}`}
+                                                            href={`${process.env.REACT_APP_API_URL}/uploads/receipts/${selectedPayment.receipt_file}`}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
                                                             className="btn btn-outline-primary btn-sm me-2"
@@ -1151,7 +1151,7 @@ const AdminDashboard = () => {
                                                             <i className="fas fa-file-pdf"></i> View Receipt
                                                         </a>
                                                         <a 
-                                                            href={`http://REACT_APP_API_URL/uploads/receipts/${selectedPayment.receipt_file}`}
+                                                            href={`${process.env.REACT_APP_API_URL}/uploads/receipts/${selectedPayment.receipt_file}`}
                                                             download
                                                             className="btn btn-outline-secondary btn-sm"
                                                         >

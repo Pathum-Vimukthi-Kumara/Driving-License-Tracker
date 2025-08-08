@@ -55,7 +55,7 @@ console.log('Database connection attempt to:', cleanDbConfig.host);
 const pool = mysql.createPool({
     ...cleanDbConfig,
     waitForConnections: true,
-    connectionLimit: 10,
+    connectionLimit: 5, // Match MySQL user's max_user_connections
     queueLimit: 0,
     enableKeepAlive: true,
     keepAliveInitialDelay: 0
