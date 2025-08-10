@@ -28,7 +28,7 @@ body {
 }
 
 .register-card{
-    margin-left:-900px;
+    margin: 0 auto;
 }
 .login-container {
     justify-content: flex-end;
