@@ -67,7 +67,8 @@ router.post('/', authenticateToken, upload.single('receipt'), (req, res) => {
             paymentId: result.insertId 
         });
     });
-});
+        });
+
 
 // Get all payments (for admin)
 router.get('/', authenticateToken, (req, res) => {
