@@ -30,7 +30,7 @@ const app = express();
 
 // Middleware with error handling
 app.use(cors({
-    origin: ['http://20.6.131.96:3000', 'https://driving-license-tracker.vercel.app', 'https://driving-license-tracker-tmrx.vercel.app'],
+    origin: ['http://localhost:3000', 'https://driving-license-tracker.vercel.app', 'https://driving-license-tracker-tmrx.vercel.app'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     credentials: true
 }));

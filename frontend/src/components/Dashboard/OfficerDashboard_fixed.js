@@ -252,7 +252,7 @@ const OfficerDashboard = () => {
                                 <div className="officer-stat-number">
                                     {violations.filter(v => v.payment_status === 'Pending').length}
                                 </div>
-                                <div className="officer-stat-label">Pending\nPayments</div>
+                                <div className="officer-stat-label">Pending Payments</div>
                             </Card.Body>
                         </Card>
                         
@@ -276,7 +276,7 @@ const OfficerDashboard = () => {
                                 <div className="officer-stat-number">
                                     {violations.reduce((sum, v) => sum + (v.payment_status === 'Paid' ? parseFloat(v.fine_amount) : 0), 0).toFixed(0)}
                                 </div>
-                                <div className="officer-stat-label">Total Fines\nCollected (LKR)</div>
+                                <div className="officer-stat-label">Total Fines Collected (LKR)</div>
                             </Card.Body>
                         </Card>
                     </div>
