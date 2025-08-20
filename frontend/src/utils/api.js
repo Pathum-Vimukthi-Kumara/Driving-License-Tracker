@@ -7,7 +7,7 @@ const isProduction = process.env.NODE_ENV === 'production';
 // In development, use the full URL from environment or default
 const API_BASE_URL = isProduction 
     ? ''  // Empty base URL in production to avoid path duplication
-    : process.env.REACT_APP_API_URL || 'http://20.6.131.96:5000'; 
+    : process.env.REACT_APP_API_URL || 'http://localhost:5000'; 
 
 console.log('API Configuration:', {
   baseURL: API_BASE_URL,
