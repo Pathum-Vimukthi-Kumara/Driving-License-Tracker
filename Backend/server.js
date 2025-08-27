@@ -3,10 +3,7 @@ const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
 
-// Log environment details to help with debugging
-console.log('NODE_ENV:', process.env.NODE_ENV);
-console.log('Working directory:', __dirname);
-console.log('Available files in root:', fs.existsSync(__dirname) ? fs.readdirSync(__dirname) : 'Directory not accessible');
+
 
 // Load environment variables
 try {
