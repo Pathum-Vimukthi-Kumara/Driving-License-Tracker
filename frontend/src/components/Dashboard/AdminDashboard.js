@@ -421,6 +421,12 @@ const AdminDashboard = () => {
                                 <h3>Users Management ({users.length})</h3>
                             </div>
                             
+                            <div className="swipe-hint d-block d-md-none" style={{ fontSize: '0.95em', color: '#888', marginBottom: '0.5rem' }}>
+                                <i className="fas fa-arrows-alt-h me-1"></i>Swipe to see more →
+                            </div>
+                            <div className="swipe-hint d-block d-md-none" style={{ fontSize: '0.95em', color: '#888', marginBottom: '0.5rem' }}>
+                                <i className="fas fa-arrows-alt-h me-1"></i>Swipe to see more →
+                            </div>
                             <div className="table-responsive">
                                 <Table className="data-table">
                                     <thead>
