@@ -1,3 +1,4 @@
+// ...existing code...
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -11,8 +12,8 @@ import Register from './components/Auth/Register';
 
 // Dashboard Components
 import UserDashboard from './components/Dashboard/UserDashboard';
-import OfficerDashboard from './components/Dashboard/OfficerDashboard';
 import AdminDashboard from './components/Dashboard/AdminDashboard';
+import OfficerDashboard from './components/Dashboard/OfficerDashboard_fixed';
 
 // Payment Component
 import PaymentSubmission from './components/Payment/PaymentSubmission';
@@ -38,13 +39,11 @@ function App() {
               <UserDashboard />
             </ProtectedRoute>
           } />
-          
           <Route path="/officer-dashboard" element={
             <ProtectedRoute userType="officer">
               <OfficerDashboard />
             </ProtectedRoute>
           } />
-          
           <Route path="/admin-dashboard" element={
             <ProtectedRoute userType="admin">
               <AdminDashboard />

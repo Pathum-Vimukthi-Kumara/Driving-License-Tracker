@@ -29,10 +29,20 @@ process.on('uncaughtException', (error) => {
 const app = express();
 
 // Middleware with error handling
+// CORS middleware with explicit preflight handling
 app.use(cors({
     origin: ['http://localhost:3000', 'https://driving-license-tracker.vercel.app', 'https://driving-license-tracker-tmrx.vercel.app'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    credentials: true
+    credentials: true,
+    optionsSuccessStatus: 200 // Some legacy browsers choke on 204
+}));
+
+// Explicitly handle preflight OPTIONS requests for all routes
+app.options('*', cors({
+    origin: ['http://localhost:3000', 'https://driving-license-tracker.vercel.app', 'https://driving-license-tracker-tmrx.vercel.app'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    credentials: true,
+    optionsSuccessStatus: 200
 }));
 
 // Log all requests for debugging

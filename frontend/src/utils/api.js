@@ -80,6 +80,7 @@ export const officerAPI = {
     getProfile: () => api.get('/api/officers/profile'),
     getViolations: () => api.get('/api/officers/violations'),
     searchUser: (licenseNumber) => api.get(`/api/officers/search-user/${licenseNumber}`),
+    getUserProfile: (id) => api.get(`/api/officers/user/${id}/profile`),
 };
 
 // Violation API calls

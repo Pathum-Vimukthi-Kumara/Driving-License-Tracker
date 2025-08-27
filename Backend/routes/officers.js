@@ -1,7 +1,42 @@
+
 const express = require('express');
 const db = require('../database/connection');
 const authenticateToken = require('../middleware/auth');
 const router = express.Router();
+
+// Get citizen profile by user ID (for officers)
+router.get('/user/:userId/profile', authenticateToken, (req, res) => {
+    const userId = req.params.userId;
+    // Get user basic info
+    const userQuery = 'SELECT user_id, name, email, phone_number, driving_license_number, address, date_of_birth FROM Users WHERE user_id = ?';
+    db.query(userQuery, [userId], (err, userResults) => {
+        if (err) {
+            return res.status(500).json({ message: 'Database error', error: err });
+        }
+        if (userResults.length === 0) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        const user = userResults[0];
+        // Get all violations for this user
+        const violationsQuery = `
+            SELECT v.*, o.officer_name, p.payment_amount, p.payment_date, p.receipt_file
+            FROM Violations v
+            LEFT JOIN Officers o ON v.officer_id = o.officer_id
+            LEFT JOIN Payments p ON v.violation_id = p.violation_id
+            WHERE v.user_id = ?
+            ORDER BY v.violation_date DESC
+        `;
+        db.query(violationsQuery, [userId], (err, violationResults) => {
+            if (err) {
+                return res.status(500).json({ message: 'Database error', error: err });
+            }
+            res.json({
+                ...user,
+                previous_violations: violationResults
+            });
+        });
+    });
+});
 
 // Get officer profile
 router.get('/profile', authenticateToken, (req, res) => {

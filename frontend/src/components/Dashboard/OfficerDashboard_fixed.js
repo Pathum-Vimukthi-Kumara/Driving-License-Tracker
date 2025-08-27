@@ -163,9 +163,9 @@ const OfficerDashboard = () => {
 
     const handleViewUserProfile = async (userId) => {
         try {
-            const response = await adminAPI.getUserProfile(userId);
-            setSelectedUserProfile(response.data.user);
-            setUserViolations(response.data.violations || []);
+            const response = await officerAPI.getUserProfile(userId);
+            setSelectedUserProfile(response.data);
+            setUserViolations(response.data.previous_violations || []);
             setShowUserProfileModal(true);
         } catch (error) {
             setError('Failed to load user profile');
@@ -644,8 +644,8 @@ const OfficerDashboard = () => {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {userViolations.map((violation) => (
-                                                <tr key={violation.violation_id}>
+                                            {userViolations.map((violation, idx) => (
+                                                <tr key={violation.violation_id ? `${violation.violation_id}-${idx}` : idx}>
                                                     <td>{formatDate(violation.violation_date)}</td>
                                                     <td>{violation.violation_type}</td>
                                                     <td>{formatCurrency(violation.fine_amount)}</td>
