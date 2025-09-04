@@ -1,12 +1,9 @@
 import axios from 'axios';
 
-// Configuration for different environments
 const isProduction = process.env.NODE_ENV === 'production';
 
-// In production (Vercel), use relative paths
-// In development, use the full URL from environment or default
 const API_BASE_URL = isProduction 
-    ? ''  // Empty base URL in production to avoid path duplication
+    ? ''  
     : process.env.REACT_APP_API_URL || 'http://localhost:5000'; 
 
 console.log('API Configuration:', {
@@ -15,7 +12,6 @@ console.log('API Configuration:', {
   isProduction
 });
 
-// Create axios instance with default config
 const api = axios.create({
     baseURL: API_BASE_URL,
     headers: {
@@ -23,7 +19,6 @@ const api = axios.create({
     },
 });
 
-// Add request interceptor to include auth token
 api.interceptors.request.use(
     (config) => {
         const token = localStorage.getItem('token');
@@ -37,7 +32,6 @@ api.interceptors.request.use(
     }
 );
 
-// Add response interceptor to handle auth errors
 api.interceptors.response.use(
     (response) => {
         return response;

@@ -264,7 +264,7 @@ const OfficerDashboard = () => {
                                 <div className="officer-stat-number">
                                     {violations.filter(v => v.payment_status === 'Paid').length}
                                 </div>
-                                <div className="officer-stat-label">Resolved\nViolations</div>
+                                <div className="officer-stat-label">Resolved Violations</div>
                             </Card.Body>
                         </Card>
                         

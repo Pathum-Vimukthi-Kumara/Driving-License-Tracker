@@ -3,7 +3,7 @@
     min-height: 100vh;
       margin: 0;
  
-  -webkit-font-smoothing: antialiased;
+    -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 
     background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.4)), url('../images/Landing.jpg');
@@ -16,7 +16,6 @@
     flex-direction: column;
 }
 
-/* Add background texture/pattern */
 .landing-page::before {
     content: '';
     position: absolute;

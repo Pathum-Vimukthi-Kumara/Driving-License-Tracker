@@ -6,7 +6,7 @@ import '../../styles/admin-dashboard.css';
 import '../../styles/modal-styles.css';
 
 const AdminDashboard = () => {
-    const [stats, setStats] = useState({});
+    const [stats, setStats] = useState({});//hold the dashboard statistic 
     const [users, setUsers] = useState([]);
     const [officers, setOfficers] = useState([]);
     const [violations, setViolations] = useState([]);
@@ -421,12 +421,6 @@ const AdminDashboard = () => {
                                 <h3>Users Management ({users.length})</h3>
                             </div>
                             
-                            <div className="swipe-hint d-block d-md-none" style={{ fontSize: '0.95em', color: '#888', marginBottom: '0.5rem' }}>
-                                <i className="fas fa-arrows-alt-h me-1"></i>Swipe to see more →
-                            </div>
-                            <div className="swipe-hint d-block d-md-none" style={{ fontSize: '0.95em', color: '#888', marginBottom: '0.5rem' }}>
-                                <i className="fas fa-arrows-alt-h me-1"></i>Swipe to see more →
-                            </div>
                             <div className="table-responsive">
                                 <Table className="data-table">
                                     <thead>
