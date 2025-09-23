@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Navbar, Nav, Container, Card, Form, Button, Alert, Table, Badge, Modal } from 'react-bootstrap';
-import { officerAPI, violationAPI, adminAPI } from '../../utils/api';
+import { officerAPI, violationAPI } from '../../utils/api';
 import '../../styles/officer-dashboard.css';
 
 const OfficerDashboard = () => {
@@ -240,7 +240,7 @@ const OfficerDashboard = () => {
                                     <i className="fas fa-exclamation-triangle"></i>
                                 </div>
                                 <div className="officer-stat-number">{violations.length}</div>
-                                <div className="officer-stat-label">Total\nViolations Filed</div>
+                                <div className="officer-stat-label">Total Violations Filed</div>
                             </Card.Body>
                         </Card>
                         

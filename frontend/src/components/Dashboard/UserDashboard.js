@@ -36,9 +36,6 @@ const UserDashboard = () => {
             setViolations(response.data);
             setStats({
                 total: response.data.length,
-
-
-
                 pending: response.data.filter(v => v.payment_status === 'Pending').length,
                 paid: response.data.filter(v => v.payment_status === 'Paid').length                     
 
@@ -50,12 +47,7 @@ const UserDashboard = () => {
             setLoading(false);
         }
     };
-    // Handle logout and redirect to login page
 
-   
-        
-            
-          
 
     const handleLogout = () => {
         localStorage.removeItem('token');
@@ -123,13 +115,11 @@ const UserDashboard = () => {
 
             <div className="dashboard-content">
                 <Container>
-                    {/* Welcome Section */}
+               
                     <div className="welcome-section">
                         <h2>Welcome back, {user?.name || 'pathum'}!</h2>
                         <p>Here's an overview of your driving license status and violations.</p>
                     </div>
-
-                    {/* Stats Cards */}
                     <div className="stats-cards">
                         <div className="stat-card total">
                             <h3>{stats.total}</h3>
@@ -146,7 +136,6 @@ const UserDashboard = () => {
                         </div>
                     </div>
 
-                    {/* Profile Section */}
                     <div className="profile-section" id="profile">
                         <div className="profile-header">
                             <div className="profile-avatar">
@@ -168,12 +157,12 @@ const UserDashboard = () => {
                             </div>
                             <div className="detail-item">
                                 <label>Address</label>
-                                <span>{user?.address || 'Balpatiya, Galle District'}</span>
+                                <span>{user?.address}</span>
                             </div>
                         </div>
                     </div>
 
-                    {/* Violations Section */}
+                   
                     <div className="violations-section" id="violations">
                         <div className="section-header">
                             <h3>My Violations</h3>
@@ -265,7 +254,6 @@ const UserDashboard = () => {
                 </Container>
             </div>
 
-            {/* Violation Details Modal */}
             <Modal show={showModal} onHide={handleCloseModal} size="lg">
                 <Modal.Header closeButton>
                     <Modal.Title>Violation Details</Modal.Title>
@@ -273,7 +261,7 @@ const UserDashboard = () => {
                 <Modal.Body>
                     {selectedViolation && (
                         <div className="violation-details">
-                            {/* Header Section - Violation ID and Status */}
+                            
                             <div className="violation-header mb-4">
                                 <div className="row align-items-center">
                                     <div className="col-md-6">
@@ -345,8 +333,6 @@ const UserDashboard = () => {
                                     </div>
                                 </div>
                             </div>
-
-                            {/* Payment Information */}
                             {selectedViolation.payment_date && (
                                 <div className="row">
                                     <div className="col-12">

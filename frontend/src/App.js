@@ -26,14 +26,14 @@ function App() {
     <Router>
       <div className="App">
         <Routes>
-          {/* Landing Page */}
+         
           <Route path="/" element={<LandingPage />} />
           
-          {/* Auth Routes */}
+         
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           
-          {/* Dashboard Routes */}
+       
           <Route path="/user-dashboard" element={
             <ProtectedRoute userType="user">
               <UserDashboard />
@@ -56,7 +56,6 @@ function App() {
             </ProtectedRoute>
           } />
           
-          {/* Fallback Route */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>

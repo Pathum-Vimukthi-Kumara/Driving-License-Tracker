@@ -39,13 +39,12 @@ const PaymentSubmission = () => {
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         if (file) {
-            // Validate file size (5MB limit)
+           
             if (file.size > 5 * 1024 * 1024) {
                 setError('File size must be less than 5MB');
                 return;
             }
             
-            // Validate file type
             const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
             if (!allowedTypes.includes(file.type)) {
                 setError('Only JPEG, PNG, and PDF files are allowed');
@@ -86,7 +85,7 @@ const PaymentSubmission = () => {
             await paymentAPI.submit(formData);
             setSuccess('Payment submitted successfully! Your payment is under review.');
             
-            // Redirect to dashboard after 3 seconds
+            
             setTimeout(() => {
                 navigate('/user-dashboard');
             }, 3000);
@@ -162,7 +161,7 @@ const PaymentSubmission = () => {
 
                                     {violation && (
                                         <>
-                                            {/* Violation Details */}
+                                           
                                             <div className="mb-4 p-3 bg-light rounded">
                                                 <h5 className="text-primary mb-3">Violation Details</h5>
                                                 <div className="row">
@@ -184,7 +183,7 @@ const PaymentSubmission = () => {
                                                 </div>
                                             </div>
 
-                                            {/* Payment Form */}
+                                            
                                             <Form onSubmit={handleSubmit}>
                                                 <div className="mb-4">
                                                     <h5 className="text-primary mb-3">Payment Information</h5>

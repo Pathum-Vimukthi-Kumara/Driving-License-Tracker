@@ -10,7 +10,7 @@ const ProtectedRoute = ({ children, userType }) => {
     }
 
     if (userType && user.userType !== userType) {
-        // Redirect to appropriate dashboard based on user type
+       
         const redirectMap = {
             user: '/user-dashboard',
             officer: '/officer-dashboard',

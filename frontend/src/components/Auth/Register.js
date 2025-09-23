@@ -34,14 +34,14 @@ const Register = () => {
         setError('');
         setSuccess('');
 
-        // Validate passwords match
+        
         if (formData.password !== formData.confirmPassword) {
             setError('Passwords do not match');
             setLoading(false);
             return;
         }
 
-        // Validate password strength
+       
         if (formData.password.length < 6) {
             setError('Password must be at least 6 characters long');
             setLoading(false);
@@ -49,14 +49,14 @@ const Register = () => {
         }
 
         try {
-            // Remove confirmPassword from the data sent to server
+         
             const { confirmPassword, ...registrationData } = formData;
             
             const response = await authAPI.register(registrationData);
             
             setSuccess('Registration successful! You can now login.');
             
-            // Redirect to login after 2 seconds
+          
             setTimeout(() => {
                 navigate('/login');
             }, 2000);

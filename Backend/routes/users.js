@@ -44,7 +44,7 @@ router.get('/violations', authenticateToken, (req, res) => {
     });
 });
 
-// Update user profile
+
 router.put('/profile', authenticateToken, (req, res) => {
     const userId = req.user.id;
     const { name, phone_number, address } = req.body;

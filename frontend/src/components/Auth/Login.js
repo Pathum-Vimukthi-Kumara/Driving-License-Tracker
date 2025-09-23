@@ -30,11 +30,10 @@ const Login = () => {
             const response = await authAPI.login(formData);
             const { token, user } = response.data;
 
-            // Store token and user data
             localStorage.setItem('token', token);
             localStorage.setItem('user', JSON.stringify(user));
 
-            // Redirect based on user type
+            
             const redirectMap = {
                 user: '/user-dashboard',
                 officer: '/officer-dashboard',
@@ -43,8 +42,8 @@ const Login = () => {
             
             console.log('Login successful, user info:', user);
             
-            // Ensure proper redirect by checking both userType and role
-            let dashboardPath = '/user-dashboard'; // default
+          
+            let dashboardPath = '/user-dashboard'; 
             
             if (user.userType === 'admin' || user.role === 'admin') {
                 dashboardPath = '/admin-dashboard';

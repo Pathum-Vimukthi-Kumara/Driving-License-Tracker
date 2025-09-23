@@ -5,7 +5,6 @@ require('dotenv').config();
 
 let dbConfig;
 
-// Try to load config from JSON file first
 try {
     const configPath = path.join(__dirname, '../config/database.json');
     if (fs.existsSync(configPath)) {
@@ -16,7 +15,7 @@ try {
     console.log('Could not load database config from JSON file:', err.message);
 }
 
-// Fall back to environment variables if JSON config is not available
+
 if (!dbConfig) {
     dbConfig = {
         host: process.env.DB_HOST,
@@ -28,14 +27,13 @@ if (!dbConfig) {
     console.log('Database config loaded from environment variables');
 }
 
-// Filter out any invalid MySQL connection properties
+
 const validMySQLOptions = [
     'host', 'port', 'user', 'password', 'database', 
     'charset', 'timezone', 'connectTimeout', 'ssl',
     'debug', 'trace', 'multipleStatements', 'flags'
 ];
 
-// Create a clean config with only valid MySQL options
 const cleanDbConfig = {};
 for (const option of validMySQLOptions) {
     if (dbConfig[option] !== undefined) {
@@ -43,28 +41,23 @@ for (const option of validMySQLOptions) {
     }
 }
 
-// Add a reasonable connection timeout
 if (!cleanDbConfig.connectTimeout) {
-    cleanDbConfig.connectTimeout = 10000; // 10 seconds
+    cleanDbConfig.connectTimeout = 10000; 
 }
 
-// Log the database config (without sensitive info)
 console.log('Database connection attempt to:', cleanDbConfig.host);
 
-// Create a connection pool for better performance and reliability
+
 const pool = mysql.createPool({
     ...cleanDbConfig,
     waitForConnections: true,
-    connectionLimit: 5, // Match MySQL user's max_user_connections
+    connectionLimit: 5, 
     queueLimit: 0,
     enableKeepAlive: true,
     keepAliveInitialDelay: 0
 });
 
-// Convert to promise-based pool for easier use with async/await
-const promisePool = pool.promise();
 
-// Test the connection
 pool.getConnection((err, connection) => {
     if (err) {
         console.error('Error connecting to MySQL database:', err);
@@ -82,14 +75,13 @@ pool.getConnection((err, connection) => {
         }
     } else {
         console.log('Connected to MySQL database successfully');
-        connection.release(); // Release connection when done
+        connection.release(); 
     }
 });
 
-// Handle unexpected errors
 pool.on('error', (err) => {
     console.error('Unexpected database error:', err);
-    // Attempt to reconnect automatically
+  
 });
 
 module.exports = pool;

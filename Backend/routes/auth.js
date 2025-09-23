@@ -9,7 +9,7 @@ router.post('/register', async (req, res) => {
     try {
         const { name, email, phone_number, driving_license_number, password, address, date_of_birth } = req.body;
 
-        // Check if user already exists
+     
         const checkUser = 'SELECT * FROM Users WHERE email = ? OR driving_license_number = ?';
         db.query(checkUser, [email, driving_license_number], async (err, results) => {
             if (err) {
@@ -22,7 +22,7 @@ router.post('/register', async (req, res) => {
             }
 
             // Hash password
-            const hashedPassword = await bcrypt.hash(password, 10);            // Insert new user
+            const hashedPassword = await bcrypt.hash(password, 10);            
             const insertUser = 'INSERT INTO Users (name, email, phone_number, driving_license_number, password, address, date_of_birth) VALUES (?, ?, ?, ?, ?, ?, ?)';
             db.query(insertUser, [name, email, phone_number, driving_license_number, hashedPassword, address, date_of_birth], (err, result) => {
                 if (err) {
@@ -31,12 +31,12 @@ router.post('/register', async (req, res) => {
 
                 const userId = result.insertId;
 
-                // Link any existing violations for this license number
+          
                 const linkViolations = 'UPDATE Violations SET user_id = ? WHERE driving_license_number = ? AND user_id IS NULL';
                 db.query(linkViolations, [userId, driving_license_number], (err, linkResult) => {
                     if (err) {
                         console.error('Error linking violations:', err);
-                        // Don't fail registration if violation linking fails
+                      
                     } else if (linkResult.affectedRows > 0) {
                         console.log(`Linked ${linkResult.affectedRows} existing violations to user ${userId}`);
                     }
@@ -99,7 +99,7 @@ router.post('/login', (req, res) => {
                 return res.status(401).json({ message: 'Invalid credentials' });
             }
 
-            // Generate JWT token
+           
             const token = jwt.sign(
                 { 
                     id: user.id, 

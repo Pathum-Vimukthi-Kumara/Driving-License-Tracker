@@ -2,9 +2,9 @@ const jwt = require('jsonwebtoken');
 
 const authenticateToken = (req, res, next) => {
     try {
-        console.log('Auth headers:', req.headers);
+      
         const authHeader = req.headers['authorization'];
-        console.log('Authorization header:', authHeader);
+        
         
         const token = authHeader && authHeader.split(' ')[1];
 
@@ -12,7 +12,7 @@ const authenticateToken = (req, res, next) => {
             return res.status(401).json({ message: 'Access token required' });
         }
 
-        // Check if JWT_SECRET is defined
+        
         if (!process.env.JWT_SECRET) {
             console.error('JWT_SECRET is not defined in environment variables');
             return res.status(500).json({ message: 'Server configuration error' });

@@ -8,7 +8,7 @@ router.post('/', authenticateToken, (req, res) => {
     const { user_id, driving_license_number, citizen_name, violation_type, violation_description, fine_amount } = req.body;
     const officer_id = req.user.id;
     
-    // If user_id is provided, create violation for registered user
+   
     if (user_id) {
         const query = 'INSERT INTO Violations (user_id, officer_id, violation_type, violation_description, fine_amount) VALUES (?, ?, ?, ?, ?)';
         
@@ -23,7 +23,7 @@ router.post('/', authenticateToken, (req, res) => {
             });
         });
     } else if (driving_license_number) {
-        // Create violation for unregistered user using license number
+     
         const query = 'INSERT INTO Violations (user_id, officer_id, violation_type, violation_description, fine_amount, driving_license_number, citizen_name) VALUES (?, ?, ?, ?, ?, ?, ?)';
         
         db.query(query, [null, officer_id, violation_type, violation_description, fine_amount, driving_license_number, citizen_name], (err, result) => {

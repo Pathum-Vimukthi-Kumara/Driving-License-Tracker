@@ -32,7 +32,6 @@ const upload = multer({
     }
 });
 
-// Create directory if it doesn't exist
 const fs = require('fs');
 const uploadDir = 'uploads/receipts/';
 if (!fs.existsSync(uploadDir)) {
@@ -54,7 +53,7 @@ router.post('/', authenticateToken, upload.single('receipt'), (req, res) => {
             return res.status(500).json({ message: 'Database error', error: err });
         }
         
-        // Update violation to mark payment as submitted (but still pending admin approval)
+        
         const updateQuery = 'UPDATE Violations SET payment_submitted = TRUE WHERE violation_id = ?';
         db.query(updateQuery, [violation_id], (err) => {
             if (err) {

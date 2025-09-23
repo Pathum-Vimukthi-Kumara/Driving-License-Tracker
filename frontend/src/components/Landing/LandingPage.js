@@ -16,7 +16,7 @@ const LandingPage = () => {
 
     return (
         <div className="landing-page">
-            {/* Navigation */}
+         
             <Navbar expand="lg" className="navbar" fixed="top">
                 <Container>
                     <Navbar.Brand href="#home" className="d-flex align-items-center">
@@ -32,7 +32,7 @@ const LandingPage = () => {
                 </Container>
             </Navbar>
 
-            {/* Hero Section */}
+         
             <section className="hero-section">
                 <Container>
                     <div className="hero-content">
@@ -54,13 +54,13 @@ const LandingPage = () => {
                 </Container>
             </section>
 
-            {/* Features Section */}
+         
             <section className="features-section" id="features">
                 <Container>
                     
                     
                     <Row className="justify-content-center">
-                        {/* Citizens Card */}
+                   
                         <Col lg={4} md={6} sm={12} className="mb-4">
                             <Card 
                                 className="feature-card h-100 citizen-card"
@@ -74,19 +74,18 @@ const LandingPage = () => {
                                         For Citizens
                                     </Card.Title>
                                     <Card.Text className="feature-description mobile-feature-description">
-                                        View your driving license information, check violation status, pay fines online, and track your payment history.
+                                        View your driving license information, check violation status,and track your payment history.
                                     </Card.Text>
                                     <ul className="feature-list mobile-feature-list">
                                         <li>View license details</li>
                                         <li>Check violations</li>
-                                        <li>Pay fines online</li>
                                         <li>Payment history</li>
                                     </ul>
                                 </Card.Body>
                             </Card>
                         </Col>
 
-                        {/* Police Officers Card */}
+                        
                         <Col lg={4} md={6} sm={12} className="mb-4">
                             <Card 
                                 className="feature-card h-100 officer-card"
@@ -112,7 +111,7 @@ const LandingPage = () => {
                             </Card>
                         </Col>
 
-                        {/* Security Card */}
+                       
                         <Col lg={4} md={6} sm={12} className="mb-4">
                             <Card className="feature-card h-100 security-card">
                                 <Card.Body className="text-center mobile-card-body">
@@ -128,8 +127,6 @@ const LandingPage = () => {
                                     <ul className="feature-list mobile-feature-list">
                                         <li>Secure authentication</li>
                                         <li>Encrypted data</li>
-                                        <li>Cloud infrastructure</li>
-                                        <li>Real-time updates</li>
                                     </ul>
                                 </Card.Body>
                             </Card>
@@ -138,7 +135,7 @@ const LandingPage = () => {
                 </Container>
             </section>
 
-            {/* Footer */}
+        
             <footer className="landing-footer">
                 <Container>
                     <Row>

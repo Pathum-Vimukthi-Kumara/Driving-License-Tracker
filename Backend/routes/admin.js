@@ -6,7 +6,6 @@ const router = express.Router();
 
 // Get dashboard statistics
 router.get('/dashboard', authenticateToken, (req, res) => {
-    // Check if user is admin
     if (req.user.userType !== 'admin' && req.user.role !== 'admin') {
         console.log('Unauthorized access attempt to admin dashboard:', req.user);
         return res.status(403).json({ message: 'Access forbidden: Admin privileges required' });
@@ -44,7 +43,7 @@ router.get('/dashboard', authenticateToken, (req, res) => {
     });
 });
 
-// Get all users
+
 router.get('/users', authenticateToken, (req, res) => {
     try {
         const query = 'SELECT user_id, name, email, phone_number, driving_license_number, address, date_of_birth, registration_date FROM Users ORDER BY registration_date DESC';
@@ -81,7 +80,7 @@ router.post('/officers', authenticateToken, async (req, res) => {
     try {
         const { officer_name, officer_email, officer_phone, password, role } = req.body;
         
-        // Check if officer already exists
+     
         const checkOfficer = 'SELECT * FROM Officers WHERE officer_email = ?';
         db.query(checkOfficer, [officer_email], async (err, results) => {
             if (err) {
@@ -92,10 +91,10 @@ router.post('/officers', authenticateToken, async (req, res) => {
                 return res.status(400).json({ message: 'Officer already exists with this email' });
             }
             
-            // Hash password
+           
             const hashedPassword = await bcrypt.hash(password, 10);
             
-            // Insert new officer
+          
             const insertOfficer = 'INSERT INTO Officers (officer_name, officer_email, officer_phone, password, role) VALUES (?, ?, ?, ?, ?)';
             db.query(insertOfficer, [officer_name, officer_email, officer_phone, hashedPassword, role], (err, result) => {
                 if (err) {
@@ -126,7 +125,7 @@ router.put('/users/:id', authenticateToken, (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
         
-        // Update user
+      
         const updateQuery = `
             UPDATE Users 
             SET name = ?, email = ?, phone_number = ?, driving_license_number = ?, 

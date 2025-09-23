@@ -10,9 +10,12 @@ const AdminDashboard = () => {
     const [users, setUsers] = useState([]);
     const [officers, setOfficers] = useState([]);
     const [violations, setViolations] = useState([]);
-    const [payments, setPayments] = useState([]);    const [loading, setLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState('dashboard');    const [showOfficerModal, setShowOfficerModal] = useState(false);
-    const [showViolationModal, setShowViolationModal] = useState(false);    const [showUserModal, setShowUserModal] = useState(false);
+    const [payments, setPayments] = useState([]); 
+    const [loading, setLoading] = useState(true);
+    const [activeTab, setActiveTab] = useState('dashboard'); 
+    const [showOfficerModal, setShowOfficerModal] = useState(false);
+    const [showViolationModal, setShowViolationModal] = useState(false); 
+    const [showUserModal, setShowUserModal] = useState(false);
     const [showPaymentModal, setShowPaymentModal] = useState(false);
     const [showUserProfileModal, setShowUserProfileModal] = useState(false);
     const [showDeleteUserModal, setShowDeleteUserModal] = useState(false);
@@ -43,7 +46,9 @@ const AdminDashboard = () => {
         date_of_birth: '',
         address: ''
     });
+
     const navigate = useNavigate();
+// update the this without using refreshing
 
     useEffect(() => {
         // Check if user is admin before fetching data
@@ -60,6 +65,7 @@ const AdminDashboard = () => {
         fetchOfficers();
         fetchViolations();
         fetchPayments();
+
     }, []);
 
     const fetchDashboardData = async () => {
@@ -194,7 +200,6 @@ const AdminDashboard = () => {
     const handleViewUserProfile = async (user) => {
         try {
             setSelectedUserProfile(user);
-            // Fetch user's violations
             const response = await adminAPI.getUserViolations(user.user_id);
             setUserViolations(response.data);
             setShowUserProfileModal(true);
@@ -262,7 +267,7 @@ const AdminDashboard = () => {
             setSuccess('Payment confirmed successfully!');
             setShowConfirmPaymentModal(false);
             fetchPayments();
-            fetchViolations(); // Refresh violations to update status
+            fetchViolations(); 
         } catch (error) {
             setError(error.response?.data?.message || 'Failed to confirm payment');
         }
@@ -367,7 +372,7 @@ const AdminDashboard = () => {
                                             <i className="fas fa-user-shield"></i>
                                         </div>
                                         <div className="stat-number">{stats.totalOfficers || 0}</div>
-                                        <div className="stat-label">{"Total\nOfficers"}</div>
+                                        <div className="stat-label">{"Total Officers"}</div>
                                     </Card.Body>
                                 </Card>
                                 
@@ -377,7 +382,7 @@ const AdminDashboard = () => {
                                             <i className="fas fa-file-alt"></i>
                                         </div>
                                         <div className="stat-number">{stats.totalViolations || 0}</div>
-                                        <div className="stat-label">{"Total\nViolations"}</div>
+                                        <div className="stat-label">{"Total Violations"}</div>
                                     </Card.Body>
                                 </Card>
                                 
@@ -387,7 +392,7 @@ const AdminDashboard = () => {
                                             <i className="fas fa-credit-card"></i>
                                         </div>
                                         <div className="stat-number">{stats.totalPayments || 0}</div>
-                                        <div className="stat-label">{"Total\nPayments"}</div>
+                                        <div className="stat-label">{"Total Payments"}</div>
                                     </Card.Body>
                                 </Card>
                                 
@@ -397,7 +402,7 @@ const AdminDashboard = () => {
                                             <i className="fas fa-ellipsis-h"></i>
                                         </div>
                                         <div className="stat-number">{stats.pendingPayments || 0}</div>
-                                        <div className="stat-label">{"Pending\nPayments"}</div>
+                                        <div className="stat-label">{"Pending Payments"}</div>
                                     </Card.Body>
                                 </Card>
                                 
@@ -435,12 +440,7 @@ const AdminDashboard = () => {
                                     </thead>
                                     <tbody>
                                         {users.map((user) => (
-                                            <tr key={user.user_id}>
-                                                <td><strong>{user.name}</strong></td>
-                                                <td>{user.email}</td>
-                                                <td>{user.phone_number}</td>
-                                                <td>{user.driving_license_number}</td>
-                                                <td>{formatDate(user.registration_date)}</td>                                                <td>
+                                            <tr key={user.user_id}><td><strong>{user.name}</strong></td><td>{user.email}</td><td>{user.phone_number}</td><td>{user.driving_license_number}</td><td>{formatDate(user.registration_date)}</td><td>
                                                     <div className="action-buttons">
                                                         <Button
                                                             size="sm"
@@ -473,7 +473,7 @@ const AdminDashboard = () => {
                                 </Table>
                             </div>
                         </div>
-                    )}
+         )}
 
                     {/* Officers Tab */}
                     {activeTab === 'officers' && (
@@ -502,15 +502,7 @@ const AdminDashboard = () => {
                                     </thead>
                                     <tbody>
                                         {officers.map((officer) => (
-                                            <tr key={officer.officer_id}>
-                                                <td><strong>{officer.officer_name}</strong></td>
-                                                <td>{officer.officer_email}</td>
-                                                <td>{officer.officer_phone}</td>
-                                                <td>
-                                                    <Badge bg="info">{officer.role}</Badge>
-                                                </td>
-                                                <td>{formatDate(officer.registration_date)}</td>
-                                                <td>
+                                            <tr key={officer.officer_id}><td><strong>{officer.officer_name}</strong></td><td>{officer.officer_email}</td><td>{officer.officer_phone}</td><td><Badge bg="info">{officer.role}</Badge></td><td>{formatDate(officer.registration_date)}</td><td>
                                                     <div className="action-buttons">
                                                         <Button
                                                             size="sm"
@@ -552,28 +544,7 @@ const AdminDashboard = () => {
                                     </thead>
                                     <tbody>
                                         {violations.map((violation) => (
-                                            <tr key={violation.violation_id}>
-                                                <td>{formatDate(violation.violation_date)}</td>
-                                                <td><strong>{violation.user_name}</strong></td>
-                                                <td>{violation.driving_license_number}</td>
-                                                <td>
-                                                    <div>
-                                                        <strong>{violation.violation_type}</strong>
-                                                        <br />
-                                                        <small className="text-muted">
-                                                            {violation.violation_description?.substring(0, 30)}...
-                                                        </small>
-                                                    </div>
-                                                </td>
-                                                <td>{violation.officer_name}</td>
-                                                <td><strong>{formatCurrency(violation.fine_amount)}</strong></td>
-                                                <td>
-                                                    <Badge 
-                                                        bg={violation.payment_status === 'Paid' ? 'success' : 'warning'}
-                                                    >
-                                                        {violation.payment_status}
-                                                    </Badge>
-                                                </td>                                                <td>
+                                            <tr key={violation.violation_id}><td>{formatDate(violation.violation_date)}</td><td><strong>{violation.user_name}</strong></td><td>{violation.driving_license_number}</td><td><div><strong>{violation.violation_type}</strong><br /><small className="text-muted">{violation.violation_description?.substring(0, 30)}...</small></div></td><td>{violation.officer_name}</td><td><strong>{formatCurrency(violation.fine_amount)}</strong></td><td><Badge bg={violation.payment_status === 'Paid' ? 'success' : 'warning'}>{violation.payment_status}</Badge></td><td>
                                                     <div className="action-buttons">
                                                         <Button
                                                             size="sm"
@@ -624,13 +595,7 @@ const AdminDashboard = () => {
                                     </thead>
                                     <tbody>
                                         {payments.map((payment) => (
-                                            <tr key={payment.payment_id}>
-                                                <td>{formatDate(payment.payment_date)}</td>
-                                                <td><strong>{payment.user_name}</strong></td>
-                                                <td>{payment.driving_license_number}</td>
-                                                <td>{payment.violation_type}</td>
-                                                <td>{formatCurrency(payment.fine_amount)}</td>
-                                                <td><strong>{formatCurrency(payment.payment_amount)}</strong></td>                                                <td>
+                                            <tr key={payment.payment_id}><td>{formatDate(payment.payment_date)}</td><td><strong>{payment.user_name}</strong></td><td>{payment.driving_license_number}</td><td>{payment.violation_type}</td><td>{formatCurrency(payment.fine_amount)}</td><td><strong>{formatCurrency(payment.payment_amount)}</strong></td><td>
                                                     {payment.receipt_file && (
                                                         <a 
                                                             href={`${process.env.REACT_APP_API_URL}/uploads/receipts/${payment.receipt_file}`}
@@ -968,19 +933,7 @@ const AdminDashboard = () => {
                                                     </thead>
                                                     <tbody>
                                                         {userViolations.map((violation) => (
-                                                            <tr key={violation.violation_id}>
-                                                                <td><small>{formatDate(violation.violation_date)}</small></td>
-                                                                <td><strong>{violation.violation_type}</strong></td>
-                                                                <td>
-                                                                    <div className="violation-desc">
-                                                                        <small>{violation.violation_description.length > 40 
-                                                                            ? `${violation.violation_description.substring(0, 40)}...`
-                                                                            : violation.violation_description
-                                                                        }</small>
-                                                                    </div>
-                                                                </td>
-                                                                <td><strong><small>{formatCurrency(violation.fine_amount)}</small></strong></td>
-                                                                <td>
+                                                            <tr key={violation.violation_id}><td><small>{formatDate(violation.violation_date)}</small></td><td><strong>{violation.violation_type}</strong></td><td><div className="violation-desc"><small>{violation.violation_description.length > 40 ? `${violation.violation_description.substring(0, 40)}...` : violation.violation_description}</small></div></td><td><strong><small>{formatCurrency(violation.fine_amount)}</small></strong></td><td>
                                                                     {violation.payment_status === 'Paid' ? (
                                                                         <Badge bg="success" size="sm">Paid</Badge>
                                                                     ) : violation.payment_submitted ? (

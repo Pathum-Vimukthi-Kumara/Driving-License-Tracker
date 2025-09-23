@@ -7,7 +7,7 @@ const router = express.Router();
 // Get citizen profile by user ID (for officers)
 router.get('/user/:userId/profile', authenticateToken, (req, res) => {
     const userId = req.params.userId;
-    // Get user basic info
+   
     const userQuery = 'SELECT user_id, name, email, phone_number, driving_license_number, address, date_of_birth FROM Users WHERE user_id = ?';
     db.query(userQuery, [userId], (err, userResults) => {
         if (err) {
@@ -17,7 +17,7 @@ router.get('/user/:userId/profile', authenticateToken, (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
         const user = userResults[0];
-        // Get all violations for this user
+ 
         const violationsQuery = `
             SELECT v.*, o.officer_name, p.payment_amount, p.payment_date, p.receipt_file
             FROM Violations v
@@ -95,7 +95,7 @@ router.get('/search-user/:licenseNumber', authenticateToken, (req, res) => {
             return res.status(500).json({ message: 'Database error', error: err });
         }
         
-        // Get all violations for this license number (both registered and unregistered)
+
         const violationsQuery = `
             SELECT v.*, 
                    COALESCE(u.name, v.citizen_name) as violator_name,
@@ -115,7 +115,7 @@ router.get('/search-user/:licenseNumber', authenticateToken, (req, res) => {
             }
             
             if (userResults.length === 0) {
-                // User not found in database - return structure for unregistered user
+               
                 return res.json({
                     user_id: null,
                     name: null,
@@ -128,7 +128,7 @@ router.get('/search-user/:licenseNumber', authenticateToken, (req, res) => {
                 });
             }
             
-            // User found - return user data with previous violations
+  
             res.json({
                 ...userResults[0],
                 is_registered: true,
