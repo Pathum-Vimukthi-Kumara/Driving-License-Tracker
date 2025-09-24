@@ -11,11 +11,11 @@ const UserDashboard = () => {
     const [selectedViolation, setSelectedViolation] = useState(null);
     const [showModal, setShowModal] = useState(false);
     const [stats, setStats] = useState({
-        total: 7,
-        pending: 1,
-        paid: 6
+        total: 0,
+        pending: 0,
+        paid: 0
     });
-    const navigate = useNavigate();
+const navigate = useNavigate();
 
     useEffect(() => {
         fetchUserData();
@@ -117,14 +117,13 @@ const UserDashboard = () => {
                 <Container>
                
                     <div className="welcome-section">
-                        <h2>Welcome back, {user?.name || 'pathum'}!</h2>
+                        <h2>Welcome back, {user?.name}!</h2>
                         <p>Here's an overview of your driving license status and violations.</p>
                     </div>
                     <div className="stats-cards">
                         <div className="stat-card total">
                             <h3>{stats.total}</h3>
-                            <p>Total 
-                                      Violations</p>
+                            <p>Total  Violations</p>
                         </div>
                         <div className="stat-card pending">
                             <h3>{stats.pending}</h3>
@@ -139,17 +138,17 @@ const UserDashboard = () => {
                     <div className="profile-section" id="profile">
                         <div className="profile-header">
                             <div className="profile-avatar">
-                                {(user?.name || 'P').charAt(0).toUpperCase()}
+                                {(user?.name ).charAt(0).toUpperCase()}
                             </div>
                             <div className="profile-info">
-                                <h4>{user?.name || 'pathum'}</h4>
-                                <p>License: {user?.driving_license_number || 'L001234568'}</p>
+                                <h4>{user?.name}</h4>
+                                <p>License: {user?.driving_license_number}</p>
                             </div>
                         </div>
                         <div className="profile-details">
                             <div className="detail-item">
                                 <label>Email</label>
-                                <span>{user?.email || 'netadmin@admin.com'}</span>
+                                <span>{user?.email}</span>
                             </div>
                             <div className="detail-item">
                                 <label>Date of Birth</label>

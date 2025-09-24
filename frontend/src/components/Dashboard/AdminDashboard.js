@@ -48,10 +48,8 @@ const AdminDashboard = () => {
     });
 
     const navigate = useNavigate();
-// update the this without using refreshing
 
     useEffect(() => {
-        // Check if user is admin before fetching data
         const user = JSON.parse(localStorage.getItem('user') || '{}');
         
         if (user.userType !== 'admin' && user.role !== 'admin') {

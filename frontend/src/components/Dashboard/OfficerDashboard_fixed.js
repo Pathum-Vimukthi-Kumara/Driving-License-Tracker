@@ -125,7 +125,7 @@ const OfficerDashboard = () => {
                 setSuccess('Violation filed successfully! The citizen will see this violation when they register.');
             }
             
-            // Reset form
+            
             setViolationForm({
                 violation_type: '',
                 violation_description: '',
@@ -135,7 +135,7 @@ const OfficerDashboard = () => {
             setSearchResult(null);
             setLicenseSearch('');
             
-            // Refresh violations list
+           
             fetchViolations();
         } catch (error) {
             setError(error.response?.data?.message || 'Failed to file violation');

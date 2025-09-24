@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Card, Form, Button, Alert, Navbar, Nav } from 'react-bootstrap';
 import { violationAPI, paymentAPI } from '../../utils/api';
-import '../../styles/user-dashboard.css';
+import '../../styles/payment-submission.css';
 
 const PaymentSubmission = () => {
     const { violationId } = useParams();
@@ -71,7 +71,6 @@ const PaymentSubmission = () => {
             setError('Please enter a valid payment amount');
             return;
         }
-
         setSubmitting(true);
         setError('');
         setSuccess('');
